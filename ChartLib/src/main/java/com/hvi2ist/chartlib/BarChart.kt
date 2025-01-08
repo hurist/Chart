@@ -42,7 +42,7 @@ class BarChart @JvmOverloads constructor(
     private val valueUnitTextSize = 12.sp
     private val valueUnitText = "Unit(ml/hours)"
 
-    private val axisLineWidth = 1.dp
+    private val axisLineWidth = 4.dp
     private val axisLinePaint = Paint().apply {
         strokeWidth = axisLineWidth
         color = textColor
@@ -50,7 +50,7 @@ class BarChart @JvmOverloads constructor(
 
 
     private val barColor = Color.BLUE
-    private val barMaxWidth = 10.dp
+    private val barMaxWidth = 18.dp
     private val barMinWidth = 2.dp
 
     // 柱状数据最小间隔
@@ -157,7 +157,7 @@ class BarChart @JvmOverloads constructor(
 
     private fun drawBar(canvas: Canvas) {
         val chartStartX = chartStartX + axisLineWidth / 2
-        val chartWidth = measuredWidth - paddingEnd - chartStartX - axisLineWidth / 2
+        val chartWidth = measuredWidth - paddingEnd - chartStartX
         var barWidth = (chartWidth - (data.size - 1) * barMinSpace) / data.size
         barWidth = barWidth.coerceIn(barMinWidth, barMaxWidth)
         val space = (chartWidth - barWidth * data.size) / (data.size - 1)
@@ -205,7 +205,7 @@ class BarChart @JvmOverloads constructor(
         // 横坐标
         val xAxisEndX = measuredWidth - paddingEnd.toFloat()
         canvas.drawLine(
-            chartStartX, chartBottomY, xAxisEndX, chartBottomY,
+            chartStartX - axisLineWidth / 2, chartBottomY, xAxisEndX, chartBottomY,
             axisLinePaint
         )
 

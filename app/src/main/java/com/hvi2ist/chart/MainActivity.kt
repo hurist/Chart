@@ -38,9 +38,12 @@ class MainActivity : ComponentActivity() {
         )
 
         val data = mutableListOf<BarData>()
-        repeat(10) {
+        repeat(31) {
             BarData("0$it", Random.nextInt(0, 2000)).also { data.add(it) }
         }
+        // 如果data的大小超过7，label要控制间隔，间隔中间的label不显示
+
+
         binding.barChart.setData(
             data,
             2000,

@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.hvi2ist.chart.databinding.ActivityMainBinding
 import com.hvi2ist.chart.ui.theme.ChartTheme
+import com.hvi2ist.chartlib.BarChart
+import com.hvi2ist.chartlib.BarChart.Companion.BarData
 import com.hvi2ist.chartlib.SimpleLineChart
 import com.hvi2ist.chartlib.SimpleLineChart.Companion.ChartData
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
 
@@ -32,6 +35,16 @@ class MainActivity : ComponentActivity() {
                 ChartData("13", 10),
             ),
             1
+        )
+
+        val data = mutableListOf<BarData>()
+        repeat(10) {
+            BarData("$it", Random.nextInt(0, 2000)).also { data.add(it) }
+        }
+        binding.barChart.setData(
+            data,
+            2000,
+            1000
         )
         /*setContent {
             ChartTheme {

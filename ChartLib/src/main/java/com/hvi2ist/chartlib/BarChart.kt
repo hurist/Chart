@@ -108,6 +108,7 @@ class BarChart @JvmOverloads constructor(
         drawValueUnitText(canvas)
         drawAxis(canvas)
         drawBar(canvas)
+        drawXAxis(canvas)
         drawTouchEvent(canvas)
     }
 
@@ -150,75 +151,39 @@ class BarChart @JvmOverloads constructor(
             axisLinePaint
         )
 
-        // 横坐标
-        val xAxisY = yAxisEndY
-        val xAxisStartX = yAxisX
-        val xAxisEndX = measuredWidth - paddingEnd.toFloat()
-        canvas.drawLine(
-            xAxisStartX, xAxisY, xAxisEndX, xAxisY,
-            axisLinePaint
-        )
-
-        data.map { it.label }.forEachIndexed { index, value ->
-            val tX = when (index) {
-                0 -> xAxisStartX
-                data.size - 1 -> measuredWidth - paddingEnd
-                else -> {
-                    val space =
-                        (measuredWidth - paddingStart - paddingEnd - xAxisStartX) / (data.size - 1)
-                    xAxisStartX + space * index
-                }
-            }.toFloat()
-            val tY = measuredHeight
-            textPaint.textAlign = when (index) {
-                0 -> Paint.Align.LEFT
-                data.size - 1 -> Paint.Align.RIGHT
-                else -> Paint.Align.CENTER
-            }
-            canvas.drawText(value, tX, tY.toFloat(), textPaint)
-        }
-        chartStartX = xAxisStartX
-        chartBottomY = xAxisY
+        chartStartX = yAxisX
+        chartBottomY = yAxisEndY
     }
 
     private fun drawBar(canvas: Canvas) {
-
-        var chartWidth = measuredWidth - paddingStart - paddingEnd - chartStartX
+        val chartStartX = chartStartX + axisLineWidth / 2
+        val chartWidth = measuredWidth - paddingEnd - chartStartX - axisLineWidth / 2
         var barWidth = (chartWidth - (data.size - 1) * barMinSpace) / data.size
         barWidth = barWidth.coerceIn(barMinWidth, barMaxWidth)
-        chartWidth = chartWidth - barWidth
+        val space = (chartWidth - barWidth * data.size) / (data.size - 1)
+        val radius = barWidth / 2
         barRanges.clear()
         data.map { it.value }.forEachIndexed { index, value ->
             val barHeight = (chartHeight * value / maxValue)
-            val space = chartWidth / (data.size - 1)
-            val radius = barWidth / 2
             barPaint.color = when {
                 targetValue <= 0 -> barColor
                 value < targetValue -> Color.RED
                 else -> barColor
             }
-            val left = chartStartX + space * index + barWidth / 2
+            val left = chartStartX + (space + barWidth) * index
             val top = (chartTopMargin + chartHeight - barHeight + radius).coerceAtMost(chartBottomY)
             val right = left + barWidth
             val bottom = chartTopMargin + chartHeight
 
-            canvas.drawLine(
-                left + barWidth / 2, chartTopMargin, left + barWidth / 2, chartBottomY,
-                Paint().apply {
-                    color = Color.YELLOW
-                    strokeWidth = 1.dp
-                }
-            )
-
-            /*if (value != 0) {
+            if (value != 0) {
                 val rect = RectF(left, top, right, bottom)
                 canvas.drawRect(rect, barPaint)
                 // 画一个向上的半圆
                 canvas.drawArc(
-                    RectF(left, top - radius, left + barWidth, top + radius),
+                    RectF(left, top - radius, left + barWidth, top + radius + 1),
                     180f, 180f, true, barPaint
                 )
-            }*/
+            }
             barRanges.add(BarRange(left = left, right = right, bottom = bottom, top = top - radius))
         }
 
@@ -235,6 +200,35 @@ class BarChart @JvmOverloads constructor(
         }
     }
 
+
+    private fun drawXAxis(canvas: Canvas) {
+        // 横坐标
+        val xAxisEndX = measuredWidth - paddingEnd.toFloat()
+        canvas.drawLine(
+            chartStartX, chartBottomY, xAxisEndX, chartBottomY,
+            axisLinePaint
+        )
+
+        data.map { it.label }.forEachIndexed { index, value ->
+            val barRange = barRanges[index]
+            val tX = when (index) {
+                0 -> barRange.left
+                data.size - 1 -> {
+                    textPaint.getTextBounds(value, 0, value.length, bounds)
+                    measuredWidth - paddingEnd
+                }
+
+                else -> barRange.left + (barRange.right - barRange.left) / 2
+            }.toFloat()
+            val tY = measuredHeight
+            textPaint.textAlign = when (index) {
+                0 -> Paint.Align.LEFT
+                data.size - 1 -> Paint.Align.RIGHT
+                else -> Paint.Align.CENTER
+            }
+            canvas.drawText(value, tX, tY.toFloat(), textPaint)
+        }
+    }
 
     private fun drawTouchEvent(canvas: Canvas) {
         if (touchedBarIndex == -1) return
@@ -310,6 +304,7 @@ class BarChart @JvmOverloads constructor(
         this.data = data
         this.maxValue = maxValue
         this.targetValue = targetValue
+        this.valueUnit = valueUnit
         invalidate()
     }
 

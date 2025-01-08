@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
         val data = mutableListOf<BarData>()
         repeat(10) {
-            BarData("$it", Random.nextInt(0, 2000)).also { data.add(it) }
+            BarData("0$it", Random.nextInt(0, 2000)).also { data.add(it) }
         }
         binding.barChart.setData(
             data,

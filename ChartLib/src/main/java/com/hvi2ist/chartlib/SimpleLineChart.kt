@@ -45,14 +45,23 @@ class SimpleLineChart @JvmOverloads constructor(
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        /*canvas.drawRect(
+            0f, 0f, measuredWidth.toFloat(), measuredHeight.toFloat(),
+            Paint().apply {
+                color = Color.RED
+                strokeWidth = 1.dp
+                style = Paint.Style.STROKE
+            }
+        )*/
+
         val textHeight = xAxisTextPaint.fontMetrics.descent - xAxisTextPaint.fontMetrics.ascent
         val xAxisTextY = height.toFloat()
         data.map { it.time }.forEachIndexed { index, text ->
             val textX = when (index) {
-                0 -> x
-                data.size - 1 -> x + width.toFloat() - marginEnd
-                else -> x + width / (data.size - 1) * index.toFloat()
-            }
+                0 -> 0
+                data.size - 1 -> width.toFloat()
+                else -> width / (data.size - 1) * index.toFloat()
+            }.toFloat()
             xAxisTextPaint.textAlign = when (index) {
                 0 -> Paint.Align.LEFT
                 data.size - 1 -> Paint.Align.RIGHT
@@ -62,22 +71,22 @@ class SimpleLineChart @JvmOverloads constructor(
         }
 
         val xAxisLineY = xAxisTextY - textHeight - xAxisTextMargin
-        canvas.drawLine(x, xAxisLineY, width.toFloat(), xAxisLineY, xAxisLinePaint)
+        canvas.drawLine(0f, xAxisLineY, width.toFloat(), xAxisLineY, xAxisLinePaint)
 
         if (data.all { it.value == ChartData.NO_VALUE }) return
 
         val yAxis = data.map { it.value }
         val max = yAxis.maxOrNull() ?: 0
-        val yUnit = (xAxisLineY - y) / max
+        val yUnit = (xAxisLineY) / max
         val path = Path()
         val range = Path()
         val dotPos = mutableListOf<Triple<Float, Float, Float>>()
         yAxis.forEachIndexed { index, yValue ->
             val radius = if (index != focusedIndex) dotRadius else focusedDotRadius - 4.dp
-            var dotX = x + width / (yAxis.size - 1) * index.toFloat()
-            if (index == 0) dotX = x + radius
-            if (index == data.size - 1) dotX = x + width.toFloat() - marginEnd - radius
-            val dotY = (xAxisLineY - yValue * yUnit).coerceIn(y + radius, xAxisLineY)
+            var dotX = width / (yAxis.size - 1) * index.toFloat()
+            if (index == 0) dotX = radius
+            if (index == data.size - 1) dotX = width.toFloat() - radius
+            val dotY = (xAxisLineY - yValue * yUnit).coerceIn(radius, xAxisLineY)
             dotPos.add(Triple(dotX, dotY, radius))
             if (index == 0) {
                 path.moveTo(dotX, dotY)
@@ -98,7 +107,7 @@ class SimpleLineChart @JvmOverloads constructor(
         canvas.drawPath(range, Paint().apply {
             style = Paint.Style.FILL
             shader = LinearGradient(
-                0f, y.toFloat(), 0f, xAxisLineY,
+                0f, 0f, 0f, xAxisLineY,
                 themeColor.changeAlpha(80), Color.TRANSPARENT, Shader.TileMode.CLAMP
             )
         })

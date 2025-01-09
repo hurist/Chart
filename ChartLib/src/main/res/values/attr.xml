@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StepProgress">
+        <attr name="spProgressBarHeight" format="dimension"/>
+        <attr name="spInactiveColor" format="color"/>
+        <attr name="spActiveColor" format="color"/>
+        <attr name="spMax" format="integer"/>
+        <attr name="spProgress" format="integer"/>
+        <attr name="spIconSize" format="dimension"/>
+        <attr name="spIconMargin" format="dimension"/>
+        <attr name="spIconDrawable" format="reference"/>
+    </declare-styleable>
+</resources>

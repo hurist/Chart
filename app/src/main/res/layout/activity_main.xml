@@ -1,27 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <com.hvi2ist.chartlib.SimpleLineChart
         android:id="@+id/simpleLineChart"
         android:layout_width="match_parent"
-        android:layout_marginTop="60dp"
+        android:layout_height="100dp"
         android:layout_marginHorizontal="10dp"
-        android:layout_height="100dp"/>
+        android:layout_marginTop="60dp" />
 
     <com.hvi2ist.chartlib.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:paddingHorizontal="12dp"
-        android:layout_marginTop="30dp" />
+        app:chartHeight="220dp"
+        app:chartLeftMargin="6dp"
+        app:chartBottomMargin="6dp"
+        app:chartTopMargin="50dp"
+        app:axisLineWidth="0.33dp"
+        app:axisTextColor="#FF999999"
+        app:axisTextSize="9sp"
+        app:barColor="#FF83B2EE"
+        app:targetLineColor="#FFCCCCCC"
+        app:barUnreachedColor="#FFE2EDFB"
+        app:touchInfoBackgroundColor="#FFF4F5F7"
+        app:touchInfoInnerHorizontalPadding="6dp"
+        app:touchInfoInnerVerticalPadding="9dp"
+        app:touchInfoTextSize="13sp"
+        app:valueUnitTextSize="9sp" />
 
     <com.hvi2ist.chartlib.StepProgress
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:spActiveColor="#ff0000"
-        app:spProgress="30"/>
+        app:spProgress="30" />
 </LinearLayout>

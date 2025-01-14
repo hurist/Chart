@@ -26,55 +26,143 @@ class BarChart @JvmOverloads constructor(
     private var data = listOf<BarData>()
     private var valueUnit = "ml"
 
-    private val chartHeight = 200.dp
-    private val chartBottomMargin = 10.dp
-    private val chartLeftMargin = 10.dp
-    private val chartTopMargin = 60.dp
-
-    private val textColor = Color.BLACK
-    private val xAxisTextSize = 12.sp
-    private val textPaint = Paint().apply {
-        textSize = xAxisTextSize
-        color = textColor
-    }
-
-    private val yAxisTextSize = 12.sp
-    private val valueUnitTextSize = 12.sp
-    private val valueUnitText = "Unit(ml/hours)"
-
-    private val axisLineWidth = 4.dp
-    private val axisLinePaint = Paint().apply {
-        strokeWidth = axisLineWidth
-        color = textColor
-    }
-
-
-    private val barColor = Color.BLUE
-    private val barMaxWidth = 18.dp
-    private val barMinWidth = 2.dp
-
-    // 柱状数据最小间隔
-    private val barMinSpace = 2.dp
-    private val barPaint = Paint().apply {
-        color = barColor
-        style = Paint.Style.FILL
-    }
-
-
     private var chartStartX = 0f
     private var chartBottomY = 0f
-
     private var touchedBarIndex = -1
     private var barRanges = mutableListOf<BarRange>()
 
-    private var touchLinePaint = Paint().apply {
-        color = Color.RED
-        strokeWidth = 1.dp
-    }
 
+    // 表本体的高度，不包含单位那部分
+    private var chartHeight = 200.dp
+
+    // 横轴到底部文字的距离
+    private var chartBottomMargin = 10.dp
+
+    // 纵轴到左边文字的距离
+    private var chartLeftMargin = 10.dp
+
+    // 图标到view最顶部的距离， valueUnitText和触摸信息会在这个空间内绘制
+    private var chartTopMargin = 60.dp
+
+    // 横纵轴文字和单位文字的颜色
+    private var axisTextColor = Color.BLACK
+
+    // 横纵轴文字的大小
+    private var axisTextSize = 12.sp
+    private var axisLineColor = Color.BLACK
+    private var axisLineWidth = 4.dp
+    private var valueUnitTextSize = 12.sp
+    private var valueUnitText = "Unit(ml/hours)"
+
+    // 未到达目标值的颜色
+    private var barUnreachedColor = Color.GRAY
+    private var barColor = Color.BLUE
+    private var barMaxWidth = 18.dp
+    private var barMinWidth = 2.dp
+    private var targetLineColor = Color.RED
+
+    // 柱状数据最小间隔
+    private var barMinSpace = 2.dp
+
+    private var touchLineColor = Color.RED
     private var touchInfoInnerVerticalPadding = 10.dp
     private var touchInfoInnerHorizontalPadding = 12.dp
     private var touchInfoCorner = 4.dp
+    private var touchInfoBackgroundColor = Color.GRAY
+    private var touchInfoTextSize = 12.sp
+    private var touchInfoTextColor = Color.BLACK
+
+    private lateinit var textPaint: Paint
+    private lateinit var valueUnitTextPaint: Paint
+    private lateinit var axisLinePaint: Paint
+    private lateinit var barPaint: Paint
+    private lateinit var touchInfoTextPaint: Paint
+    private lateinit var touchLinePaint: Paint
+    private lateinit var targetLinePaint: Paint
+    private lateinit var touchInfoBackgroundPaint: Paint
+
+    init {
+        val typedArray =
+            context.obtainStyledAttributes(attrs, R.styleable.BarChart, defStyleAttr, 0)
+
+        chartHeight = typedArray.getDimension(R.styleable.BarChart_chartHeight, chartHeight)
+        chartBottomMargin =
+            typedArray.getDimension(R.styleable.BarChart_chartBottomMargin, chartBottomMargin)
+        chartLeftMargin =
+            typedArray.getDimension(R.styleable.BarChart_chartLeftMargin, chartLeftMargin)
+        chartTopMargin =
+            typedArray.getDimension(R.styleable.BarChart_chartTopMargin, chartTopMargin)
+        axisTextColor = typedArray.getColor(R.styleable.BarChart_axisTextColor, axisTextColor)
+        axisTextSize = typedArray.getDimension(R.styleable.BarChart_axisTextSize, axisTextSize)
+        axisLineColor = typedArray.getColor(R.styleable.BarChart_axisLineColor, axisLineColor)
+        axisLineWidth = typedArray.getDimension(R.styleable.BarChart_axisLineWidth, axisLineWidth)
+        valueUnitTextSize =
+            typedArray.getDimension(R.styleable.BarChart_valueUnitTextSize, valueUnitTextSize)
+        barUnreachedColor =
+            typedArray.getColor(R.styleable.BarChart_barUnreachedColor, barUnreachedColor)
+        barColor = typedArray.getColor(R.styleable.BarChart_barColor, barColor)
+        barMaxWidth = typedArray.getDimension(R.styleable.BarChart_barMaxWidth, barMaxWidth)
+        barMinWidth = typedArray.getDimension(R.styleable.BarChart_barMinWidth, barMinWidth)
+        targetLineColor = typedArray.getColor(R.styleable.BarChart_targetLineColor, targetLineColor)
+        touchLineColor = typedArray.getColor(R.styleable.BarChart_touchLineColor, touchLineColor)
+        touchInfoBackgroundColor = typedArray.getColor(
+            R.styleable.BarChart_touchInfoBackgroundColor,
+            touchInfoBackgroundColor
+        )
+        touchInfoTextSize =
+            typedArray.getDimension(R.styleable.BarChart_touchInfoTextSize, touchInfoTextSize)
+        touchInfoTextColor =
+            typedArray.getColor(R.styleable.BarChart_touchInfoTextColor, touchInfoTextColor)
+        touchInfoInnerHorizontalPadding = typedArray.getDimension(
+            R.styleable.BarChart_touchInfoInnerHorizontalPadding,
+            touchInfoInnerHorizontalPadding
+        )
+        touchInfoInnerVerticalPadding = typedArray.getDimension(
+            R.styleable.BarChart_touchInfoInnerVerticalPadding,
+            touchInfoInnerVerticalPadding
+        )
+        typedArray.recycle()
+
+        initPaints()
+    }
+
+    private fun initPaints() {
+        textPaint = Paint().apply {
+            textSize = axisTextSize
+            color = axisTextColor
+        }
+        valueUnitTextPaint = Paint().apply {
+            textSize = valueUnitTextSize
+            color = axisTextColor
+        }
+        axisLinePaint = Paint().apply {
+            strokeWidth = axisLineWidth
+            color = axisLineColor
+        }
+        barPaint = Paint().apply {
+            color = barColor
+            style = Paint.Style.FILL
+        }
+        touchInfoTextPaint = Paint().apply {
+            textSize = touchInfoTextSize
+            color = touchInfoTextColor
+            textAlign = Paint.Align.CENTER
+        }
+        touchLinePaint = Paint().apply {
+            color = touchLineColor
+            strokeWidth = 1.dp
+        }
+        targetLinePaint = Paint().apply {
+            color = targetLineColor
+            strokeWidth = 1.dp
+            pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f)
+        }
+        touchInfoBackgroundPaint = Paint().apply {
+            color = touchInfoBackgroundColor
+            style = Paint.Style.FILL
+        }
+    }
+
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         //  高度为横坐标轴文字高度 + chartBottomMargin + chartHeight + chartTopMargin
@@ -106,7 +194,7 @@ class BarChart @JvmOverloads constructor(
 
         // 画图表单位
         drawValueUnitText(canvas)
-        drawAxis(canvas)
+        drawYAxis(canvas)
         drawBar(canvas)
         drawXAxis(canvas)
         drawTouchEvent(canvas)
@@ -119,14 +207,14 @@ class BarChart @JvmOverloads constructor(
         val textHeight = bounds.height()
         val x = paddingStart
         val y = chartTopMargin / 2 + textHeight / 2
-        canvas.drawText(valueUnitText, x.toFloat(), y.toFloat(), textPaint)
+        canvas.drawText(valueUnitText, x.toFloat(), y.toFloat(), valueUnitTextPaint)
     }
 
 
     /**
-     * 画横纵坐标轴和坐标轴文字
+     * 画纵坐标轴和坐标轴文字
      */
-    private fun drawAxis(canvas: Canvas) {
+    private fun drawYAxis(canvas: Canvas) {
         // 纵坐标
         textPaint.textAlign = Paint.Align.LEFT
         val yValues = listOf(0, maxValue / 4, maxValue / 2, maxValue / 4 * 3, maxValue).reversed()
@@ -167,7 +255,7 @@ class BarChart @JvmOverloads constructor(
             val barHeight = (chartHeight * value / maxValue)
             barPaint.color = when {
                 targetValue <= 0 -> barColor
-                value < targetValue -> Color.RED
+                value < targetValue -> barUnreachedColor
                 else -> barColor
             }
             val left = chartStartX + (space + barWidth) * index
@@ -191,11 +279,7 @@ class BarChart @JvmOverloads constructor(
             val targetY = chartTopMargin + chartHeight * (maxValue - targetValue) / maxValue
             canvas.drawLine(
                 chartStartX, targetY, measuredWidth - paddingEnd.toFloat(), targetY,
-                Paint().apply {
-                    color = Color.RED
-                    strokeWidth = 1.dp
-                    pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f)
-                }
+                targetLinePaint
             )
         }
     }
@@ -236,7 +320,7 @@ class BarChart @JvmOverloads constructor(
         val centerX = barRange.left + (barRange.right - barRange.left) / 2
 
         val text = "${data[touchedBarIndex].value}$valueUnit"
-        textPaint.getTextBounds(text, 0, text.length, bounds)
+        touchInfoTextPaint.getTextBounds(text, 0, text.length, bounds)
         val textHeight = bounds.height()
         val textWidth = bounds.width()
         val infoWidth = textWidth + touchInfoInnerHorizontalPadding * 2
@@ -248,15 +332,12 @@ class BarChart @JvmOverloads constructor(
         val infoRect = RectF(infoLeft, infoTop, infoRight, infoBottom)
         canvas.drawRoundRect(
             infoRect, touchInfoCorner, touchInfoCorner,
-            Paint().apply {
-                color = Color.GRAY
-                style = Paint.Style.FILL
-            }
+            touchInfoBackgroundPaint
         )
 
-        val textStartX = centerX + textWidth / 2
+        val textStartX = centerX
         val textStartY = infoTop + touchInfoInnerVerticalPadding + textHeight
-        canvas.drawText(text, textStartX, textStartY, textPaint)
+        canvas.drawText(text, textStartX, textStartY, touchInfoTextPaint)
         canvas.drawLine(
             centerX, infoBottom, centerX, barRange.bottom,
             touchLinePaint

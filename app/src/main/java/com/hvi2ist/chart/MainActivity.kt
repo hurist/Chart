@@ -23,6 +23,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var binding : ActivityMainBinding
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

@@ -1,6 +1,8 @@
 package com.hvi2ist.chart
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -50,6 +52,12 @@ class MainActivity : ComponentActivity() {
             2000,
             1000
         )
+        binding.barChart.setOnTouchBarListener { infoView, barData ->
+            infoView.findViewById<TextView>(com.hvi2ist.chartlib.R.id.root).text = barData.value.toString()
+        }
+
+        //binding.barChart.childInfoView = LayoutInflater.from(this).inflate(com.hvi2ist.chartlib.R.layout.layout_test, null, false)
+
         /*setContent {
             ChartTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

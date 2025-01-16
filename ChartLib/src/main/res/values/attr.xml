@@ -12,10 +12,8 @@
     </declare-styleable>
 
     <declare-styleable name="BarChart">
-        <attr name="chartHeight" format="dimension" />
         <attr name="chartBottomMargin" format="dimension" />
         <attr name="chartLeftMargin" format="dimension" />
-        <attr name="chartTopMargin" format="dimension" />
         <attr name="axisTextColor" format="color" />
         <attr name="axisTextSize" format="dimension" />
         <attr name="axisLineColor" format="color" />
@@ -25,12 +23,7 @@
         <attr name="barMaxWidth" format="dimension" />
         <attr name="barMinWidth" format="dimension" />
         <attr name="touchLineColor" format="color" />
-        <attr name="touchInfoInnerVerticalPadding" format="dimension"/>
-        <attr name="touchInfoInnerHorizontalPadding" format="dimension"/>
-        <attr name="touchInfoBackgroundColor" format="color" />
-        <attr name="touchInfoTextSize" format="dimension" />
-        <attr name="touchInfoTextColor" format="color" />
-        <attr name="valueUnitTextSize" format="dimension" />
         <attr name="targetLineColor" format="color" />
+        <attr name="infoLayout" format="reference"/>
     </declare-styleable>
 </resources>

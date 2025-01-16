@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clipChildren="false">
 
     <com.hvi2ist.chartlib.SimpleLineChart
         android:id="@+id/simpleLineChart"
@@ -12,27 +13,49 @@
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="60dp" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clipChildren="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingVertical="10dp"
+            android:text="head 1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingVertical="10dp"
+            android:text="head 2"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingVertical="10dp"
+            android:text="head 2"/>
+
+    </LinearLayout>
+
+
     <com.hvi2ist.chartlib.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_height="260dp"
         android:paddingHorizontal="12dp"
-        app:chartHeight="220dp"
         app:chartLeftMargin="6dp"
         app:chartBottomMargin="6dp"
-        app:chartTopMargin="50dp"
         app:axisLineWidth="0.33dp"
         app:axisTextColor="#FF999999"
         app:axisTextSize="9sp"
         app:barColor="#FF83B2EE"
         app:targetLineColor="#FFCCCCCC"
         app:barUnreachedColor="#FFE2EDFB"
-        app:touchInfoBackgroundColor="#FFF4F5F7"
-        app:touchInfoInnerHorizontalPadding="6dp"
-        app:touchInfoInnerVerticalPadding="9dp"
-        app:touchInfoTextSize="13sp"
-        app:valueUnitTextSize="9sp" />
+        app:infoLayout="@layout/layout_test_1"
+        android:translationZ="10000dp" />
 
     <com.hvi2ist.chartlib.StepProgress
         android:layout_width="match_parent"

@@ -1,6 +1,10 @@
 package com.hvi2ist.chartlib.util
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.view.View
+import android.view.View.MeasureSpec
 
 /**
  * 扩展函数：更改颜色的透明度
@@ -30,4 +34,20 @@ private fun Int.isValidColor(): Boolean {
     } catch (e: IllegalArgumentException) {
         false // 如果抛出异常，说明不是有效颜色
     }
+}
+
+internal fun View.toBitmap(): Bitmap {
+    // 强制测量并布局视图
+    measure(
+        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), // 宽度为 wrap_content
+        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)  // 高度为 wrap_content
+    )
+    layout(left, top, right, bottom)
+
+    val bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    background?.setBounds(0, 0, measuredWidth, measuredHeight)
+    background?.draw(canvas)
+    draw(canvas)
+    return bitmap
 }

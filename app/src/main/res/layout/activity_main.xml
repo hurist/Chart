@@ -68,6 +68,30 @@
             app:infoLayout="@layout/layout_test_1"
             app:targetLineColor="#FFCCCCCC" />
 
+        <com.hvi2ist.chartlib.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:paddingHorizontal="12dp"
+            android:translationZ="10000dp"
+            app:axisLineWidth="0.33dp"
+            app:axisTextColor="#FF999999"
+            app:axisTextSize="9sp"
+            app:infoLayout="@layout/layout_test_1"
+            app:targetLineColor="#FFCCCCCC" />
+
+        <com.hvi2ist.chartlib.TimeIntervalLineChart
+            android:id="@+id/timeLineChart"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:paddingHorizontal="12dp"
+            android:translationZ="10000dp"
+            app:axisLineWidth="0.33dp"
+            app:axisTextColor="#FF999999"
+            app:axisTextSize="9sp"
+            app:infoLayout="@layout/layout_test_1"
+            app:targetLineColor="#FFCCCCCC"/>
+
         <com.hvi2ist.chartlib.StepProgress
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

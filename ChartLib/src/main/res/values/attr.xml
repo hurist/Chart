@@ -11,19 +11,62 @@
         <attr name="spIconDrawable" format="reference"/>
     </declare-styleable>
 
+    <attr name="chartBottomMargin" format="dimension"/>
+    <attr name="chartLeftMargin" format="dimension"/>
+    <attr name="axisTextColor" format="color"/>
+    <attr name="axisTextSize" format="dimension"/>
+    <attr name="axisLineColor" format="color"/>
+    <attr name="axisLineWidth" format="dimension"/>
+    <attr name="touchLineColor" format="dimension"/>
+    <attr name="infoLayout" format="reference"/>
+    <attr name="dotRadius" format="dimension"/>
+    <attr name="dotSelectedRadius" format="dimension"/>
+
     <declare-styleable name="BarChart">
-        <attr name="chartBottomMargin" format="dimension" />
-        <attr name="chartLeftMargin" format="dimension" />
-        <attr name="axisTextColor" format="color" />
-        <attr name="axisTextSize" format="dimension" />
-        <attr name="axisLineColor" format="color" />
-        <attr name="axisLineWidth" format="dimension" />
+        <attr name="chartBottomMargin"/>
+        <attr name="chartLeftMargin"/>
+        <attr name="axisTextColor"/>
+        <attr name="axisTextSize"/>
+        <attr name="axisLineColor"/>
+        <attr name="axisLineWidth"/>
         <attr name="barUnreachedColor" format="color" />
         <attr name="barColor" format="color" />
+        <attr name="stackBarColor" format="color"/>
         <attr name="barMaxWidth" format="dimension" />
         <attr name="barMinWidth" format="dimension" />
-        <attr name="touchLineColor" format="color" />
-        <attr name="targetLineColor" format="color" />
-        <attr name="infoLayout" format="reference"/>
+        <attr name="touchLineColor"/>
+        <attr name="targetLineColor" format="color"/>
+        <attr name="infoLayout"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="LineChart">
+        <attr name="chartBottomMargin"/>
+        <attr name="chartLeftMargin" />
+        <attr name="axisTextColor"/>
+        <attr name="axisTextSize" />
+        <attr name="axisLineColor"/>
+        <attr name="axisLineWidth"/>
+        <attr name="lineColor" format="color" />
+        <attr name="lineWidth" format="dimension" />
+        <attr name="dotRadius"/>
+        <attr name="dotSelectedRadius"/>
+        <attr name="touchLineColor" />
+        <attr name="infoLayout"/>
+    </declare-styleable>
+
+    <declare-styleable name="TimeIntervalLineChart">
+        <attr name="chartBottomMargin"/>
+        <attr name="chartLeftMargin" />
+        <attr name="axisTextColor"/>
+        <attr name="axisTextSize" />
+        <attr name="axisLineColor"/>
+        <attr name="axisLineWidth"/>
+        <attr name="startDotColor" format="color"/>
+        <attr name="endDotColor" format="color"/>
+        <attr name="dotRadius"/>
+        <attr name="dotSelectedRadius"/>
+        <attr name="touchLineColor" />
+        <attr name="infoLayout"/>
     </declare-styleable>
 </resources>

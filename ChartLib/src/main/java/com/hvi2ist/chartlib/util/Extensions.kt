@@ -5,6 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.view.View
 import android.view.View.MeasureSpec
+import kotlinx.datetime.LocalTime
+import kotlin.math.abs
 
 /**
  * 扩展函数：更改颜色的透明度
@@ -50,4 +52,14 @@ internal fun View.toBitmap(): Bitmap {
     background?.draw(canvas)
     draw(canvas)
     return bitmap
+}
+
+internal fun LocalTime.isMorning(): Boolean {
+    val hour = this.hour
+    return hour < 12 || hour == 12 && this.minute == 0
+}
+internal fun LocalTime.minutesBetween(other: LocalTime): Int {
+    val thisMinutes = this.hour * 60 + this.minute
+    val otherMinutes = other.hour * 60 + other.minute
+    return abs(thisMinutes - otherMinutes)
 }

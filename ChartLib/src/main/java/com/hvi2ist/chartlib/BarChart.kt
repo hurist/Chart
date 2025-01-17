@@ -29,7 +29,6 @@ class BarChart @JvmOverloads constructor(
     private var targetValue = -1
     private var maxValue = 2000
     private var data = listOf<BarData>()
-    private var valueUnit = "ml"
 
     private var chartStartX = 0f
     private var chartBottomY = 0f
@@ -348,12 +347,10 @@ class BarChart @JvmOverloads constructor(
         data: List<BarData>,
         maxValue: Int,
         targetValue: Int = 1000,
-        valueUnit: String = "ml"
     ) {
         this.data = data
         this.maxValue = maxValue
         this.targetValue = targetValue
-        this.valueUnit = valueUnit
         invalidate()
     }
 

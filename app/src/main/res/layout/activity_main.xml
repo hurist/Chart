@@ -1,65 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:clipChildren="false">
-
-    <com.hvi2ist.chartlib.SimpleLineChart
-        android:id="@+id/simpleLineChart"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="60dp" />
+    android:clipChildren="false"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:clipChildren="false">
+        android:clipChildren="false"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingVertical="10dp"
-            android:text="head 1"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingVertical="10dp"
-            android:text="head 2"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="400dp"/>
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingVertical="10dp"
-            android:text="head 2"/>
+        <com.hvi2ist.chartlib.SimpleLineChart
+            android:id="@+id/simpleLineChart"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="60dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingVertical="10dp"
+                android:text="head 1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingVertical="10dp"
+                android:text="head 2" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingVertical="10dp"
+                android:text="head 2" />
+
+        </LinearLayout>
+
+
+        <com.hvi2ist.chartlib.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:paddingHorizontal="12dp"
+            android:translationZ="10000dp"
+            app:axisLineWidth="0.33dp"
+            app:axisTextColor="#FF999999"
+            app:axisTextSize="9sp"
+            app:barColor="#FF83B2EE"
+            app:barUnreachedColor="#FFE2EDFB"
+            app:chartBottomMargin="6dp"
+            app:chartLeftMargin="6dp"
+            app:infoLayout="@layout/layout_test_1"
+            app:targetLineColor="#FFCCCCCC" />
+
+        <com.hvi2ist.chartlib.StepProgress
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:spActiveColor="#ff0000"
+            app:spProgress="30" />
     </LinearLayout>
 
-
-    <com.hvi2ist.chartlib.BarChart
-        android:id="@+id/barChart"
-        android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:paddingHorizontal="12dp"
-        app:chartLeftMargin="6dp"
-        app:chartBottomMargin="6dp"
-        app:axisLineWidth="0.33dp"
-        app:axisTextColor="#FF999999"
-        app:axisTextSize="9sp"
-        app:barColor="#FF83B2EE"
-        app:targetLineColor="#FFCCCCCC"
-        app:barUnreachedColor="#FFE2EDFB"
-        app:infoLayout="@layout/layout_test_1"
-        android:translationZ="10000dp" />
-
-    <com.hvi2ist.chartlib.StepProgress
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:spActiveColor="#ff0000"
-        app:spProgress="30" />
-</LinearLayout>
+</ScrollView>

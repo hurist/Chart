@@ -16,6 +16,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.hvi2ist.chartlib.util.ChartUtil
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
 import com.hvi2ist.chartlib.util.toBitmap
@@ -425,11 +426,10 @@ class BarChart @JvmOverloads constructor(
 
     fun setData(
         data: List<BarData>,
-        maxValue: Int,
         targetValue: Int = 1000,
     ) {
         this.data = data
-        this.maxValue = maxValue
+        this.maxValue = ChartUtil.getChartMaxValue(data.maxOf { it.value + it.value2 }, targetValue)
         this.targetValue = targetValue
         invalidate()
     }

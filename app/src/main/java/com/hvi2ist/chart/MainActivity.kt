@@ -58,7 +58,6 @@ class MainActivity : ComponentActivity() {
         data.add(BarData("0", 10, 10))
         binding.barChart.setData(
             data,
-            2000,
             1000
         )
         binding.barChart.setOnTouchBarListener { infoView, barData, index ->

@@ -255,7 +255,7 @@ class BarChart @JvmOverloads constructor(
                 canvas.save()
                 canvas.clipRect(left, top, right, bottom)
                 // 画一个向上的半圆
-                val outArcRect = RectF(left, top, left + barWidth, top + radius * 2)
+                val outArcRect = RectF(left, top, left + barWidth, top + radius * 2 + 1)
                 canvas.drawArc(
                     outArcRect,
                     0f, -180f, false, barPaint
@@ -276,14 +276,14 @@ class BarChart @JvmOverloads constructor(
                             val rect1 = RectF(left, top + radius, right, top2)
                             canvas.drawRect(rect1, barPaint)
                             canvas.drawArc(
-                                RectF(left, top, left + barWidth, top + radius * 2),
+                                RectF(left, top, left + barWidth, top + radius * 2 + 1),
                                 0f, -180f, false, barPaint
                             )
                         } else {
                             canvas.save()
                             canvas.clipRect(left, top, left + barWidth, bottom)
                             canvas.drawArc(
-                                RectF(left, top, left + barWidth, top + radius * 2),
+                                RectF(left, top, left + barWidth, top + radius * 2 + 1),
                                 0f, -180f, false, barPaint
                             )
                             canvas.restore()
@@ -426,7 +426,7 @@ class BarChart @JvmOverloads constructor(
 
     fun setData(
         data: List<BarData>,
-        targetValue: Int = 1000,
+        targetValue: Int = -1,
     ) {
         this.data = data
         this.maxValue = ChartUtil.getChartMaxValue(data.maxOf { it.value + it.value2 }, targetValue)

@@ -17,11 +17,14 @@ import com.hvi2ist.chartlib.LineChart
 import com.hvi2ist.chartlib.SimpleLineChart.Companion.ChartData
 import com.hvi2ist.chartlib.TimeIntervalLineChart
 import com.hvi2ist.chartlib.TimeLineData
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toInstant
+import java.text.SimpleDateFormat
+import java.util.Date
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -52,17 +55,18 @@ class MainActivity : ComponentActivity() {
         // 如果data的大小超过7，label要控制间隔，间隔中间的label不显示
 
         data.add(BarData("0", 100, 1))
+        data.add(BarData("0", 10, 10))
         binding.barChart.setData(
             data,
             2000,
             1000
         )
         binding.barChart.setOnTouchBarListener { infoView, barData, index ->
-            infoView.findViewById<TextView>(com.hvi2ist.chartlib.R.id.root).text = """
+            /*infoView.findViewById<TextView>(com.hvi2ist.chartlib.R.id.root).text = """
                 total: ${barData.value + barData.value2}
                 value: ${barData.value}
                 value2: ${barData.value2}
-            """.trimIndent()
+            """.trimIndent()*/
         }
 
         val lineData = mutableListOf<LineChart.LineData>()
@@ -111,6 +115,10 @@ class MainActivity : ComponentActivity() {
                 infoView.findViewById<TextView>(com.hvi2ist.chartlib.R.id.root).text = barData.toString()
             }
         }
+        val sf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val str = sf.format(Date())
+        Log.d(TAG, "onCreate: $str")
+
     }
 
     companion object {

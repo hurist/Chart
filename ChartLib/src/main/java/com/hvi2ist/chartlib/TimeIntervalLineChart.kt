@@ -25,6 +25,7 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
+import kotlin.math.abs
 
 class TimeIntervalLineChart @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -83,6 +84,8 @@ class TimeIntervalLineChart @JvmOverloads constructor(
     private lateinit var dotPaint: Paint
 
 
+    private var infoPos = PosType.TOP
+    private var infoPadding = 20.dp
     private var infoLayoutId = -1
     private val childViewContainer = FrameLayout(context).apply {
         layoutParams = ViewGroup.LayoutParams(
@@ -143,6 +146,8 @@ class TimeIntervalLineChart @JvmOverloads constructor(
         touchLineColor =
             typedArray.getColor(R.styleable.TimeIntervalLineChart_touchLineColor, touchLineColor)
         infoLayoutId = typedArray.getResourceId(R.styleable.TimeIntervalLineChart_infoLayout, -1)
+        infoPos = PosType.fromValue(typedArray.getInt(R.styleable.TimeIntervalLineChart_infoPos, infoPos.value))
+        infoPadding = typedArray.getDimension(R.styleable.TimeIntervalLineChart_infoPadding, infoPadding)
         typedArray.recycle()
 
         if (infoLayoutId != -1) {
@@ -371,8 +376,12 @@ class TimeIntervalLineChart @JvmOverloads constructor(
             val bitmap = child.toBitmap()
             val pos = dotPos[touchedDotIndex]
             val centerX = pos.x.toFloat()
-            val chileBottomY = pos.y - 50
-            val childY = chileBottomY - child.measuredHeight
+            val lineTopY = if (infoPos == PosType.ABOVE) {
+                pos.y - infoPadding
+            } else {
+                -infoPadding
+            }
+            val childY = lineTopY - child.measuredHeight
 
             var translationX = (centerX - child.measuredWidth / 2).coerceAtLeast(0f)
             if (translationX + child.measuredWidth > measuredWidth) {
@@ -382,12 +391,14 @@ class TimeIntervalLineChart @JvmOverloads constructor(
             canvas.drawBitmap(bitmap, translationX, childY.toFloat(), Paint())
 
             canvas.drawLine(
-                centerX, chileBottomY.toFloat(), centerX, chartBottomY,
+                centerX, lineTopY.toFloat(), centerX, chartBottomY,
                 touchLinePaint
             )
         }
     }
 
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val childView = childInfoView ?: return false
@@ -399,6 +410,8 @@ class TimeIntervalLineChart @JvmOverloads constructor(
                 val y = event.y
                 touchedDotIndex = dotPos.indexOfFirst { it.isTouching(x, y) }
                 callbackTouchListener(lastTouchBarIndex, childView)
+                parent.requestDisallowInterceptTouchEvent(true)
+                postInvalidate()
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -406,6 +419,21 @@ class TimeIntervalLineChart @JvmOverloads constructor(
                 val y = event.y
                 touchedDotIndex = dotPos.indexOfFirst { it.isTouching(x, y) }
                 callbackTouchListener(lastTouchBarIndex, childView)
+                if (abs(y - lastTouchY) > 30) {
+                    parent.requestDisallowInterceptTouchEvent(false)
+                } else {
+                    lastTouchX = x
+                    lastTouchY = y
+                    parent.requestDisallowInterceptTouchEvent(true)
+                }
+                postInvalidate()
+            }
+
+            else -> {
+                touchedDotIndex = -1
+                //callbackTouchListener(lastTouchBarIndex, child)
+                parent.requestDisallowInterceptTouchEvent(false)
+                postInvalidate()
             }
         }
         Log.d(TAG, "onTouchEvent: touchedBarIndex = $touchedDotIndex")

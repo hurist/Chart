@@ -18,6 +18,7 @@ import android.widget.FrameLayout
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
 import com.hvi2ist.chartlib.util.toBitmap
+import kotlin.math.abs
 
 class LineChart @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -78,6 +79,8 @@ class LineChart @JvmOverloads constructor(
     private lateinit var dotPaint: Paint
 
 
+    private var infoPos = PosType.TOP
+    private var infoPadding = 20.dp
     private var infoLayoutId = -1
     private val childViewContainer = FrameLayout(context).apply {
         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -114,6 +117,8 @@ class LineChart @JvmOverloads constructor(
         dotSelectedRadius = typedArray.getDimension(R.styleable.LineChart_dotSelectedRadius, dotSelectedRadius)
         touchLineColor = typedArray.getColor(R.styleable.LineChart_touchLineColor, touchLineColor)
         infoLayoutId = typedArray.getResourceId(R.styleable.LineChart_infoLayout, -1)
+        infoPos = PosType.fromValue(typedArray.getInt(R.styleable.LineChart_infoPos, infoPos.value))
+        infoPadding = typedArray.getDimension(R.styleable.LineChart_infoPadding, infoPadding)
         typedArray.recycle()
 
         if (infoLayoutId != -1) {
@@ -324,8 +329,12 @@ class LineChart @JvmOverloads constructor(
             val bitmap = child.toBitmap()
             val pos = dotPos[touchedBarIndex]
             val centerX = pos.x.toFloat()
-            val chileBottomY = pos.y - 50
-            val childY = chileBottomY - child.measuredHeight
+            val lineTopY = if (infoPos == PosType.ABOVE) {
+                pos.y - infoPadding
+            } else {
+                -infoPadding
+            }
+            val childY = lineTopY - child.measuredHeight
 
             var translationX = (centerX - child.measuredWidth / 2).coerceAtLeast(0f)
             if (translationX + child.measuredWidth > measuredWidth) {
@@ -335,11 +344,14 @@ class LineChart @JvmOverloads constructor(
             canvas.drawBitmap(bitmap, translationX, childY.toFloat(), Paint())
 
             canvas.drawLine(
-                centerX, chileBottomY.toFloat(), centerX, chartBottomY,
+                centerX, lineTopY.toFloat(), centerX, chartBottomY,
                 touchLinePaint
             )
         }
     }
+
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -351,12 +363,28 @@ class LineChart @JvmOverloads constructor(
                 val x = event.x
                 val y = event.y
                 callbackTouchListener(x, lastTouchBarIndex, childView)
+                parent.requestDisallowInterceptTouchEvent(true)
+                postInvalidate()
             }
 
             MotionEvent.ACTION_MOVE -> {
                 val x = event.x
                 val y = event.y
                 callbackTouchListener(x, lastTouchBarIndex, childView)
+                if (abs(y - lastTouchY) > 50) {
+                    parent.requestDisallowInterceptTouchEvent(false)
+                } else {
+                    lastTouchX = x
+                    lastTouchY = y
+                    parent.requestDisallowInterceptTouchEvent(true)
+                }
+                postInvalidate()
+            }
+            else -> {
+                touchedBarIndex = -1
+                //callbackTouchListener(lastTouchBarIndex, child)
+                parent.requestDisallowInterceptTouchEvent(false)
+                postInvalidate()
             }
         }
         Log.d(TAG, "onTouchEvent: touchedBarIndex = $touchedBarIndex")

@@ -6,9 +6,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.RectF
-import android.text.Layout
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +19,7 @@ import android.widget.FrameLayout
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
 import com.hvi2ist.chartlib.util.toBitmap
+import kotlin.math.abs
 
 class BarChart @JvmOverloads constructor(
     context: Context,
@@ -66,6 +67,8 @@ class BarChart @JvmOverloads constructor(
     private var barMinSpace = 2.dp
 
     private var touchLineColor = Color.RED
+    private var infoPos = PosType.TOP
+    private var infoPadding = 20.dp
 
     private lateinit var textPaint: Paint
     private lateinit var axisLinePaint: Paint
@@ -75,7 +78,10 @@ class BarChart @JvmOverloads constructor(
 
     private var infoLayoutId = -1
     private val childViewContainer = FrameLayout(context).apply {
-        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
     var childInfoView: View? = null
         set(value) {
@@ -112,6 +118,8 @@ class BarChart @JvmOverloads constructor(
         targetLineColor = typedArray.getColor(R.styleable.BarChart_targetLineColor, targetLineColor)
         touchLineColor = typedArray.getColor(R.styleable.BarChart_touchLineColor, touchLineColor)
         infoLayoutId = typedArray.getResourceId(R.styleable.BarChart_infoLayout, -1)
+        infoPos = PosType.fromValue(typedArray.getInt(R.styleable.BarChart_infoPos, infoPos.value))
+        infoPadding = typedArray.getDimension(R.styleable.BarChart_infoPadding, infoPadding)
         typedArray.recycle()
 
         if (infoLayoutId != -1) {
@@ -230,24 +238,56 @@ class BarChart @JvmOverloads constructor(
                 else -> barColor
             }
             val left = chartStartX + (space + barWidth) * index
-            val top = (chartHeight - barHeight + radius).coerceAtMost(chartBottomY)
+            val top = (chartHeight - barHeight).coerceAtMost(chartBottomY)
             val top2 = top + (chartHeight * data.value2 / maxValue).coerceAtMost(chartBottomY)
             val right = left + barWidth
             val bottom = chartHeight
 
             if (value != 0) {
-                val rect = RectF(left, top, right, bottom)
+                if (value == data.value2) {
+                    barPaint.color = stackBarColor
+                } else {
+                    barPaint.color = barColor
+                }
+                val rect = RectF(left, (top + radius).coerceAtMost(chartBottomY), right, bottom)
                 canvas.drawRect(rect, barPaint)
+                canvas.save()
+                canvas.clipRect(left, top, right, bottom)
                 // 画一个向上的半圆
+                val outArcRect = RectF(left, top, left + barWidth, top + radius * 2)
                 canvas.drawArc(
-                    RectF(left, top - radius, left + barWidth, top + radius + 1),
-                    180f, 180f, true, barPaint
+                    outArcRect,
+                    0f, -180f, false, barPaint
                 )
+                canvas.restore()
+
+                if (data.value2 == value) return@forEachIndexed
 
                 if (data.value2 > 0) {
                     barPaint.color = stackBarColor
-                    val rect2 = RectF(left, top - radius, right, top2)
-                    canvas.drawRoundRect(rect2, radius, radius, barPaint)
+                    val totalHeight = top2 - top
+                    Log.d(TAG, "drawBar: totalHeight = $totalHeight")
+                    if (totalHeight >= radius * 2) {
+                        val rect1 = RectF(left, top, right, top2)
+                        canvas.drawRoundRect(rect1, radius, radius, barPaint)
+                    } else {
+                        if (totalHeight > radius) {
+                            val rect1 = RectF(left, top + radius, right, top2)
+                            canvas.drawRect(rect1, barPaint)
+                            canvas.drawArc(
+                                RectF(left, top, left + barWidth, top + radius * 2),
+                                0f, -180f, false, barPaint
+                            )
+                        } else {
+                            canvas.save()
+                            canvas.clipRect(left, top, left + barWidth, bottom)
+                            canvas.drawArc(
+                                RectF(left, top, left + barWidth, top + radius * 2),
+                                0f, -180f, false, barPaint
+                            )
+                            canvas.restore()
+                        }
+                    }
                 }
             }
             barRanges.add(BarRange(left = left, right = right, bottom = bottom, top = top - radius))
@@ -299,8 +339,12 @@ class BarChart @JvmOverloads constructor(
             val bitmap = child.toBitmap()
             val barRange = barRanges[touchedBarIndex]
             val centerX = barRange.left + (barRange.right - barRange.left) / 2
-            val chileBottomY = barRange.top - 50
-            val childY = chileBottomY - child.measuredHeight
+            val lineTopY = if (infoPos == PosType.ABOVE) {
+                barRange.top - infoPadding
+            } else {
+                -infoPadding
+            }
+            val childY = lineTopY - child.measuredHeight
 
             var translationX = (centerX - child.measuredWidth / 2).coerceAtLeast(0f)
             if (translationX + child.measuredWidth > measuredWidth) {
@@ -310,11 +354,14 @@ class BarChart @JvmOverloads constructor(
             canvas.drawBitmap(bitmap, translationX, childY, Paint())
 
             canvas.drawLine(
-                centerX, chileBottomY, centerX, barRange.bottom,
+                centerX, lineTopY, centerX, barRange.bottom,
                 touchLinePaint
             )
         }
     }
+
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -325,8 +372,12 @@ class BarChart @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 val x = event.x
                 val y = event.y
+                lastTouchX = x
+                lastTouchY = y
                 touchedBarIndex = barRanges.indexOfFirst { it.contains(x, y) }
                 callbackTouchListener(lastTouchBarIndex, child)
+                parent.requestDisallowInterceptTouchEvent(true)
+                postInvalidate()
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -334,10 +385,32 @@ class BarChart @JvmOverloads constructor(
                 val y = event.y
                 touchedBarIndex = barRanges.indexOfFirst { it.contains(x, y) }
                 callbackTouchListener(lastTouchBarIndex, child)
+                if (abs(y - lastTouchY) > 30) {
+                    parent.requestDisallowInterceptTouchEvent(false)
+                } else {
+                    lastTouchX = x
+                    lastTouchY = y
+                    parent.requestDisallowInterceptTouchEvent(true)
+                }
+                postInvalidate()
+            }
+
+            else -> {
+                touchedBarIndex = -1
+                //callbackTouchListener(lastTouchBarIndex, child)
+                parent.requestDisallowInterceptTouchEvent(false)
+                postInvalidate()
             }
         }
         Log.d(TAG, "onTouchEvent: touchedBarIndex = $touchedBarIndex")
         return true
+    }
+
+    private fun isVerticalScroll(event: MotionEvent): Boolean {
+        // 根据滑动角度或者距离判断
+        val dx = event.x - lastTouchX
+        val dy = event.y - lastTouchY
+        return Math.abs(dy) > Math.abs(dx)
     }
 
     private fun callbackTouchListener(lastTouchBarIndex: Int, child: View) {

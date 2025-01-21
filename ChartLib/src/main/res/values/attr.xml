@@ -21,6 +21,11 @@
     <attr name="infoLayout" format="reference"/>
     <attr name="dotRadius" format="dimension"/>
     <attr name="dotSelectedRadius" format="dimension"/>
+    <attr name="infoPos" format="enum">
+        <enum name="top" value="0"/>
+        <enum name="above" value="1"/>
+    </attr>
+    <attr name="infoPadding" format="dimension"/>
 
     <declare-styleable name="BarChart">
         <attr name="chartBottomMargin"/>
@@ -37,6 +42,8 @@
         <attr name="touchLineColor"/>
         <attr name="targetLineColor" format="color"/>
         <attr name="infoLayout"/>
+        <attr name="infoPos"/>
+        <attr name="infoPadding"/>
     </declare-styleable>
 
 
@@ -53,6 +60,8 @@
         <attr name="dotSelectedRadius"/>
         <attr name="touchLineColor" />
         <attr name="infoLayout"/>
+        <attr name="infoPos"/>
+        <attr name="infoPadding"/>
     </declare-styleable>
 
     <declare-styleable name="TimeIntervalLineChart">
@@ -68,5 +77,20 @@
         <attr name="dotSelectedRadius"/>
         <attr name="touchLineColor" />
         <attr name="infoLayout"/>
+        <attr name="infoPos"/>
+        <attr name="infoPadding"/>
+    </declare-styleable>
+
+    <declare-styleable name="HealthRangeView">
+        <attr name="barHeight"  format="dimension"/>
+        <attr name="dotRadius"/>
+        <attr name="rangeTextSize" format="dimension" />
+        <attr name="rangeLabelTextSize" format="dimension" />
+        <attr name="textPadding" format="dimension" />
+        <attr name="android:textColor" />
+        <attr name="label1Text" format="string" />
+        <attr name="label2Text" format="string" />
+        <attr name="label3Text" format="string" />
+        <attr name="label4Text" format="string" />
     </declare-styleable>
 </resources>

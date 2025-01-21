@@ -12,6 +12,11 @@
         android:clipChildren="false"
         android:orientation="vertical">
 
+        <com.hvi2ist.chartlib.TestView
+            android:layout_width="100dp"
+            android:layout_marginTop="40dp"
+            android:layout_height="100dp"/>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="400dp"/>
@@ -65,7 +70,7 @@
             app:barUnreachedColor="#FFE2EDFB"
             app:chartBottomMargin="6dp"
             app:chartLeftMargin="6dp"
-            app:infoLayout="@layout/layout_test_1"
+            app:infoLayout="@layout/layout_test"
             app:targetLineColor="#FFCCCCCC" />
 
         <com.hvi2ist.chartlib.LineChart

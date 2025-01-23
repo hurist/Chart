@@ -28,8 +28,8 @@ class BarChart @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var targetValue = -1
-    private var maxValue = 2000
+    private var targetValue = -1f
+    private var maxValue = 2000L
     private var data = listOf<BarData>()
 
     private var chartStartX = 0f
@@ -244,7 +244,7 @@ class BarChart @JvmOverloads constructor(
             val right = left + barWidth
             val bottom = chartHeight
 
-            if (value != 0) {
+            if (value != 0f) {
                 if (value == data.value2) {
                     barPaint.color = stackBarColor
                 } else {
@@ -426,7 +426,7 @@ class BarChart @JvmOverloads constructor(
 
     fun setData(
         data: List<BarData>,
-        targetValue: Int = -1,
+        targetValue: Float = -1f,
     ) {
         this.data = data
         this.maxValue = ChartUtil.getChartMaxValue(data.maxOf { it.value + it.value2 }, targetValue)
@@ -455,6 +455,6 @@ class BarChart @JvmOverloads constructor(
     companion object {
         const val TAG = "BarChart"
 
-        data class BarData(val label: String, val value: Int, val value2: Int = 0)
+        data class BarData(val label: String, val value: Float, val value2: Float = 0f)
     }
 }

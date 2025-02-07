@@ -10,7 +10,7 @@ object ChartUtil {
      */
     fun getChartMaxValue(maxValue: Float, targetValue: Float = -1f): Long {
         val max = max(maxValue, targetValue)
-        val value = listOf(10, 20, 50, 100, 200, 300, 400, 500, 600, 700, 800, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 1000000, 10000000, 1000000000, 1000000000)
+        val value = listOf(10, 20, 50, 100, 200, 300, 400, 500, 600, 700, 800, 1000, 2000, 2500, 3000, 4500, 5000, 10000, 20000, 50000, 100000, 1000000, 10000000, 1000000000, 1000000000)
         val t =  value.find {
             it * 4 > max
         } ?: 1000000

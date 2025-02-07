@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.hvi2ist.chart.databinding.ActivityMainBinding
 import com.hvi2ist.chart.ui.theme.ChartTheme
 import com.hvi2ist.chartlib.BarChart.Companion.BarData
+import com.hvi2ist.chartlib.HealthRangeView
 import com.hvi2ist.chartlib.LineChart
 import com.hvi2ist.chartlib.SimpleLineChart.Companion.ChartData
 import com.hvi2ist.chartlib.TimeIntervalLineChart
@@ -50,15 +51,15 @@ class MainActivity : ComponentActivity() {
 
         val data = mutableListOf<BarData>()
         repeat(31) {
-            BarData("0$it", Random.nextInt(0, 1000), Random.nextInt(0, 1000)).also { data.add(it) }
+            BarData("0$it", Random.nextInt(0, 1000).toFloat(), Random.nextInt(0, 1000).toFloat()).also { data.add(it) }
         }
         // 如果data的大小超过7，label要控制间隔，间隔中间的label不显示
 
-        data.add(BarData("0", 100, 1))
-        data.add(BarData("0", 10, 10))
+        data.add(BarData("0", 100f, 1f))
+        data.add(BarData("0", 10f, 10f))
         binding.barChart.setData(
             data,
-            1000
+            1000f
         )
         binding.barChart.setOnTouchBarListener { infoView, barData, index ->
             /*infoView.findViewById<TextView>(com.hvi2ist.chartlib.R.id.root).text = """
@@ -118,6 +119,15 @@ class MainActivity : ComponentActivity() {
         val str = sf.format(Date())
         Log.d(TAG, "onCreate: $str")
 
+        binding.healthRangeView.setData(
+            HealthRangeView.Data(
+                40..59,
+                60..69,
+                70..77,
+                78..89,
+                30
+            )
+        )
     }
 
     companion object {

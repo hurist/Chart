@@ -265,9 +265,9 @@ class LineChart @JvmOverloads constructor(
             if (index != touchedBarIndex) {
                 canvas.drawCircle(point.x.toFloat(), point.y.toFloat(), dotRadius, dotPaint)
             } else {
-                dotPaint.color = Color.WHITE
-                canvas.drawCircle(point.x.toFloat(), point.y.toFloat(), dotSelectedRadius, dotPaint)
                 dotPaint.color = dotColor
+                canvas.drawCircle(point.x.toFloat(), point.y.toFloat(), dotSelectedRadius, dotPaint)
+                dotPaint.color = Color.WHITE
                 canvas.drawCircle(point.x.toFloat(), point.y.toFloat(), dotSelectedRadius - 1.dp, dotPaint)
             }
         }

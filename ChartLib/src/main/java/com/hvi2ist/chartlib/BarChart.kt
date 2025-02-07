@@ -232,7 +232,7 @@ class BarChart @JvmOverloads constructor(
         data.forEachIndexed { index, data ->
             val value = data.value + data.value2
 
-            val barHeight = (chartHeight * value / maxValue)
+            val barHeight = (chartHeight * value / maxValue).coerceAtLeast(2.dp) // 最小高度为2dp, 不然看不见
             barPaint.color = when {
                 targetValue <= 0 -> barColor
                 value < targetValue -> barUnreachedColor
@@ -262,9 +262,7 @@ class BarChart @JvmOverloads constructor(
                 )
                 canvas.restore()
 
-                if (data.value2 == value) return@forEachIndexed
-
-                if (data.value2 > 0) {
+                if (data.value2 != value && data.value2 > 0) {
                     barPaint.color = stackBarColor
                     val totalHeight = top2 - top
                     Log.d(TAG, "drawBar: totalHeight = $totalHeight")
@@ -281,7 +279,7 @@ class BarChart @JvmOverloads constructor(
                             )
                         } else {
                             canvas.save()
-                            canvas.clipRect(left, top, left + barWidth, bottom)
+                            canvas.clipRect(left, top, left + barWidth, top2)
                             canvas.drawArc(
                                 RectF(left, top, left + barWidth, top + radius * 2 + 1),
                                 0f, -180f, false, barPaint
@@ -416,7 +414,11 @@ class BarChart @JvmOverloads constructor(
 
     private fun callbackTouchListener(lastTouchBarIndex: Int, child: View) {
         if (touchedBarIndex != -1 && touchedBarIndex != lastTouchBarIndex) {
-            onTouchBarListener?.invoke(child, data[touchedBarIndex], touchedBarIndex)
+            runCatching {
+                onTouchBarListener?.invoke(child, data[touchedBarIndex], touchedBarIndex)
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
         if (touchedBarIndex != lastTouchBarIndex) {
             postInvalidate()

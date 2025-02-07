@@ -102,6 +102,13 @@
             android:layout_height="wrap_content"
             app:spActiveColor="#ff0000"
             app:spProgress="30" />
+
+        <com.hvi2ist.chartlib.HealthRangeView
+            android:id="@+id/healthRangeView"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </ScrollView>

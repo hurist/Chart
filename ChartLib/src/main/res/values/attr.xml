@@ -62,6 +62,7 @@
         <attr name="infoLayout"/>
         <attr name="infoPos"/>
         <attr name="infoPadding"/>
+        <attr name="isPercentage" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="TimeIntervalLineChart">

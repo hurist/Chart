@@ -15,6 +15,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.hvi2ist.chartlib.util.ChartUtil
+import com.hvi2ist.chartlib.util.disableParentClip
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
 import com.hvi2ist.chartlib.util.toBitmap
@@ -24,7 +26,7 @@ class LineChart @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var maxValue = 2000
+    private var maxValue = 100L
     private var data = listOf<LineData>()
     private var rangeColors = listOf<RangeColor>()
 
@@ -70,6 +72,7 @@ class LineChart @JvmOverloads constructor(
     private val chartHorizontalPadding = 6.dp
 
     private var touchLineColor = Color.RED
+    private var isPercentage = false
 
     private lateinit var textPaint: Paint
     private lateinit var axisLinePaint: Paint
@@ -119,6 +122,7 @@ class LineChart @JvmOverloads constructor(
         infoLayoutId = typedArray.getResourceId(R.styleable.LineChart_infoLayout, -1)
         infoPos = PosType.fromValue(typedArray.getInt(R.styleable.LineChart_infoPos, infoPos.value))
         infoPadding = typedArray.getDimension(R.styleable.LineChart_infoPadding, infoPadding)
+        isPercentage = typedArray.getBoolean(R.styleable.LineChart_isPercentage, isPercentage)
         typedArray.recycle()
 
         if (infoLayoutId != -1) {
@@ -126,6 +130,11 @@ class LineChart @JvmOverloads constructor(
         }
 
         initPaints()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        disableParentClip()
     }
 
     private fun initPaints() {
@@ -181,14 +190,6 @@ class LineChart @JvmOverloads constructor(
 
         // 清除裁剪限制
         canvas.clipRect(-width, -height, width * 2, height * 2)
-        /*canvas.drawRect(
-            0f, 0f, measuredWidth.toFloat(), measuredHeight.toFloat(),
-            Paint().apply {
-                color = Color.RED
-                strokeWidth = 1.dp
-                style = Paint.Style.STROKE
-            }
-        )*/
 
         // 画图表单位
         drawYAxis(canvas)
@@ -209,8 +210,11 @@ class LineChart @JvmOverloads constructor(
         // 纵坐标
         textPaint.textAlign = Paint.Align.LEFT
         val yValues = listOf(0, maxValue / 4, maxValue / 2, maxValue / 4 * 3, maxValue).reversed()
-        val yValueMax = yValues.max()
-        textPaint.getTextBounds(yValueMax.toString(), 0, yValueMax.toString().length, bounds)
+        var yValueMax = yValues.max().toString()
+        if (isPercentage) {
+            yValueMax += "%"
+        }
+        textPaint.getTextBounds(yValueMax, 0, yValueMax.length, bounds)
         val yAxisTextWidth = bounds.width()
         val yAxisTextHeight = bounds.height()
         val yAxisTextX = paddingStart.toFloat()
@@ -218,8 +222,12 @@ class LineChart @JvmOverloads constructor(
         val yUnit = chartHeight / (yValues.size - 1)
         yValues.forEachIndexed { index, value ->
             if (index == yValues.size - 1) return@forEachIndexed
+            var valueStr = value.toString()
+            if (isPercentage) {
+                valueStr += "%"
+            }
             val tY = yUnit * index + yAxisTextHeight
-            canvas.drawText(value.toString(), yAxisTextX, tY, textPaint)
+            canvas.drawText(valueStr, yAxisTextX, tY, textPaint)
         }
 
         val yAxisX = paddingStart + yAxisTextWidth + chartLeftMargin
@@ -244,7 +252,7 @@ class LineChart @JvmOverloads constructor(
             it.value
         }.forEachIndexed { index, value ->
             val x = chartStartX + xUnit * index
-            val y = if (value == NO_VALUE) NO_VALUE_Y else chartBottomY - value * yUnit
+            val y = if (value == NO_VALUE) NO_VALUE_Y else (chartBottomY - value * yUnit).coerceAtLeast(0f)
             dotPos.add(Point(x.toInt(), y.toInt()))
         }
     }
@@ -371,7 +379,7 @@ class LineChart @JvmOverloads constructor(
                 val x = event.x
                 val y = event.y
                 callbackTouchListener(x, lastTouchBarIndex, childView)
-                if (abs(y - lastTouchY) > 50) {
+                if (abs(y - lastTouchY) > 100) {
                     parent.requestDisallowInterceptTouchEvent(false)
                 } else {
                     lastTouchX = x
@@ -413,11 +421,10 @@ class LineChart @JvmOverloads constructor(
 
     fun setData(
         data: List<LineData>,
-        maxValue: Int,
-        rangeColors: List<RangeColor>
+        rangeColors: List<RangeColor> = emptyList()
     ) {
         this.data = data
-        this.maxValue = maxValue
+        this.maxValue = if (isPercentage) 100 else ChartUtil.getChartMaxValue(data.maxOf { it.value })
         this.rangeColors = rangeColors
         invalidate()
     }

@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.hvi2ist.chartlib.util.ChartUtil
+import com.hvi2ist.chartlib.util.disableParentClip
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
 import com.hvi2ist.chartlib.util.toBitmap
@@ -128,6 +129,11 @@ class BarChart @JvmOverloads constructor(
         }
 
         initPaints()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        disableParentClip()
     }
 
     private fun initPaints() {

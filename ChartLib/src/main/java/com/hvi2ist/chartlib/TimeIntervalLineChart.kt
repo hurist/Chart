@@ -15,6 +15,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.hvi2ist.chartlib.util.disableParentClip
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.isMorning
 import com.hvi2ist.chartlib.util.minutesBetween
@@ -155,6 +156,11 @@ class TimeIntervalLineChart @JvmOverloads constructor(
         }
 
         initPaints()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        disableParentClip()
     }
 
     private fun initPaints() {

@@ -81,14 +81,13 @@ class MainActivity : ComponentActivity() {
         lineData.add(LineChart.LineData("4", 0f))
         lineData.add(LineChart.LineData("5", 75f))
         lineData.add(LineChart.LineData("6", LineChart.NO_VALUE))
-        lineData.add(LineChart.LineData("7", 100f))
+        lineData.add(LineChart.LineData("7", 110f))
         lineData.add(LineChart.LineData("8", 33.6f))
         lineData.add(LineChart.LineData("9", LineChart.NO_VALUE))
         lineData.add(LineChart.LineData("10", LineChart.NO_VALUE))
 
         binding.lineChart.setData(
             lineData,
-            100,
             listOf(
                 LineChart.RangeColor(0f to 25f, Color.RED),
                 LineChart.RangeColor(25f to 50f, Color.YELLOW),

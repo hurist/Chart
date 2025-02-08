@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.view.View
 import android.view.View.MeasureSpec
+import android.view.ViewGroup
 import kotlinx.datetime.LocalTime
 import kotlin.math.abs
 
@@ -62,4 +63,14 @@ internal fun LocalTime.minutesBetween(other: LocalTime): Int {
     val thisMinutes = this.hour * 60 + this.minute
     val otherMinutes = other.hour * 60 + other.minute
     return abs(thisMinutes - otherMinutes)
+}
+
+internal fun View.disableParentClip() {
+    val parent = parent
+    if (parent != null) {
+        if (parent is ViewGroup) {
+            parent.clipChildren = false
+            //parent.clipToPadding = false
+        }
+    }
 }

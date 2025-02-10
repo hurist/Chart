@@ -65,7 +65,7 @@ class SimpleLineChart @JvmOverloads constructor(
         val xAxisLineY = xAxisTextY - textHeight - xAxisTextMargin
         canvas.drawLine(0f, xAxisLineY, width.toFloat(), xAxisLineY, xAxisLinePaint)
 
-        if (data.all { it.value == ChartData.NO_VALUE }) return
+        //if (data.all { it.value == ChartData.NO_VALUE }) return
 
         val yAxis = data.map { it.value }
         val max = yAxis.maxOrNull() ?: 0
@@ -73,21 +73,48 @@ class SimpleLineChart @JvmOverloads constructor(
         val path = Path()
         val range = Path()
         val dotPos = mutableListOf<Triple<Float, Float, Float>>()
+        val firstValidIndex = data.indexOfFirst { it.value != ChartData.NO_VALUE }
+        val lastValidIndex = data.indexOfLast { it.value != ChartData.NO_VALUE }
+
+        // 没有有效数据
+        if (lastValidIndex == -1 && firstValidIndex == -1) {
+            range.moveTo(dotRadius, dotRadius)
+            range.lineTo(width.toFloat() - dotRadius, dotRadius)
+            range.lineTo(width.toFloat() - dotRadius, xAxisLineY)
+            range.lineTo(dotRadius, xAxisLineY)
+            range.close()
+            canvas.drawPath(range, Paint().apply {
+                style = Paint.Style.FILL
+                shader = LinearGradient(
+                    0f, 0f, 0f, xAxisLineY,
+                    themeColor.changeAlpha(80), Color.TRANSPARENT, Shader.TileMode.CLAMP
+                )
+            })
+            return
+        }
+
         yAxis.forEachIndexed { index, yValue ->
+            val lastValidPoint = dotPos.lastOrNull { it.second != INVALID_Y }
             val radius = if (index != focusedIndex) dotRadius else focusedDotRadius - 4.dp
             var dotX = width / (yAxis.size - 1) * index.toFloat()
             if (index == 0) dotX = radius
             if (index == data.size - 1) dotX = width.toFloat() - radius
 
-            val dotY = (xAxisLineY - yValue * yUnit).coerceIn(radius, xAxisLineY)
+            val dotY = if (yValue == ChartData.NO_VALUE) {
+                INVALID_Y
+            } else {
+                (xAxisLineY - yValue * yUnit).coerceIn(radius, xAxisLineY)
+            }
             dotPos.add(Triple(dotX, dotY, radius))
 
-            if (index == 0) {
-                path.moveTo(dotX, dotY)
-                range.moveTo(dotX, dotY)
-            } else {
-                path.lineTo(dotX, dotY)
-                range.lineTo(dotX, dotY)
+            if (dotY != INVALID_Y) {
+                if (index == firstValidIndex) {
+                    path.moveTo(dotX, dotY)
+                    range.moveTo(dotX, dotY)
+                } else {
+                    path.lineTo(dotX, dotY)
+                    range.lineTo(dotX, dotY)
+                }
             }
         }
         canvas.drawPath(path, Paint().apply {
@@ -95,18 +122,24 @@ class SimpleLineChart @JvmOverloads constructor(
             style = Paint.Style.STROKE
             strokeWidth = lineWidth
         })
-        range.lineTo(dotPos.last().first, xAxisLineY)
-        range.lineTo(dotPos.first().first, xAxisLineY)
-        range.close()
-        canvas.drawPath(range, Paint().apply {
-            style = Paint.Style.FILL
-            shader = LinearGradient(
-                0f, 0f, 0f, xAxisLineY,
-                themeColor.changeAlpha(80), Color.TRANSPARENT, Shader.TileMode.CLAMP
-            )
-        })
+
+        if (firstValidIndex != lastValidIndex) {
+            val firstX = dotPos[firstValidIndex].first
+            val lastX = dotPos[lastValidIndex].first
+            range.lineTo(lastX, xAxisLineY)
+            range.lineTo(firstX, xAxisLineY)
+            range.close()
+            canvas.drawPath(range, Paint().apply {
+                style = Paint.Style.FILL
+                shader = LinearGradient(
+                    0f, 0f, 0f, xAxisLineY,
+                    themeColor.changeAlpha(80), Color.TRANSPARENT, Shader.TileMode.CLAMP
+                )
+            })
+        }
 
         dotPos.forEachIndexed { index, (dotX, dotY, radius) ->
+            if (dotY == INVALID_Y) return@forEachIndexed
             if (index == focusedIndex) {
                 canvas.drawCircle(dotX, dotY, focusedDotRadius, Paint().apply {
                     style = Paint.Style.FILL
@@ -127,20 +160,24 @@ class SimpleLineChart @JvmOverloads constructor(
         }
     }
 
-    fun setData(data: List<ChartData>, focusedIndex: Int = data.indexOfLast { it.value != ChartData.NO_VALUE }) {
+    fun setData(
+        data: List<ChartData>,
+        focusedIndex: Int = data.indexOfLast { it.value != ChartData.NO_VALUE }
+    ) {
         this.data = data
-        if (data.first().value == ChartData.NO_VALUE) {
+        /*if (data.first().value == ChartData.NO_VALUE) {
             this.data = this.data.mapIndexed { index, chartData ->
                 if (index == 0) chartData.copy(value = 0)
                 else chartData
             }
-        }
+        }*/
         this.focusedIndex = focusedIndex
         invalidate()
     }
 
     companion object {
         private const val TAG = "SimpleLineChart"
+        private const val INVALID_Y = -100f
 
         data class ChartData(val time: String, val value: Int = NO_VALUE) {
             companion object {

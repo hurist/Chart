@@ -42,9 +42,9 @@ class MainActivity : ComponentActivity() {
         setContentView(binding.root)
         binding.simpleLineChart.setData(
             listOf(
-                ChartData("11", 10),
+                ChartData("11", ChartData.NO_VALUE),
                 ChartData("12", ChartData.NO_VALUE),
-                ChartData("13", 10),
+                ChartData("13", ChartData.NO_VALUE),
             ),
             1
         )

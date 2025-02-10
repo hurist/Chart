@@ -17,7 +17,7 @@
     <attr name="axisTextSize" format="dimension"/>
     <attr name="axisLineColor" format="color"/>
     <attr name="axisLineWidth" format="dimension"/>
-    <attr name="touchLineColor" format="dimension"/>
+    <attr name="touchLineColor" format="color"/>
     <attr name="infoLayout" format="reference"/>
     <attr name="dotRadius" format="dimension"/>
     <attr name="dotSelectedRadius" format="dimension"/>
@@ -26,6 +26,7 @@
         <enum name="above" value="1"/>
     </attr>
     <attr name="infoPadding" format="dimension"/>
+    <attr name="lineWidth" format="dimension" />
 
     <declare-styleable name="BarChart">
         <attr name="chartBottomMargin"/>
@@ -55,7 +56,7 @@
         <attr name="axisLineColor"/>
         <attr name="axisLineWidth"/>
         <attr name="lineColor" format="color" />
-        <attr name="lineWidth" format="dimension" />
+        <attr name="lineWidth"/>
         <attr name="dotRadius"/>
         <attr name="dotSelectedRadius"/>
         <attr name="touchLineColor" />
@@ -93,5 +94,19 @@
         <attr name="label2Text" format="string" />
         <attr name="label3Text" format="string" />
         <attr name="label4Text" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="SimpleLineChart">
+        <attr name="color" format="color" />
+        <attr name="lineWidth"/>
+        <attr name="dotRadius"/>
+        <attr name="dotSelectedRadius"/>
+        <attr name="axisTextSize"/>
+        <attr name="axisTextColor"/>
+        <attr name="axisLineColor"/>
+        <attr name="axisLineWidth"/>
+        <attr name="chartBottomMargin" />
+        <attr name="startColor" format="color"/>
+        <attr name="endColor" format="color"/>
     </declare-styleable>
 </resources>

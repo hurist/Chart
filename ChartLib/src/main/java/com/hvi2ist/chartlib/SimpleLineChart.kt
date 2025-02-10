@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.view.marginEnd
 import com.hvi2ist.chartlib.util.changeAlpha
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
@@ -23,30 +22,50 @@ class SimpleLineChart @JvmOverloads constructor(
     )
     private var focusedIndex = -1
 
-    private val xAxisTextSize = 12.sp
-    private val xAxisTextMargin = 6.dp
-    private val xAxisTextColor = Color.BLACK
-    private val xAxisTextPaint = Paint().apply {
-        color = xAxisTextColor
-        textSize = xAxisTextSize
+    private var axisLineColor = Color.BLACK
+    private var axisTextSize = 12.sp
+    private var axisTextMargin = 6.dp
+    private val axisTextColor = Color.BLACK
+    private val axisTextPaint = Paint().apply {
+        color = axisTextColor
+        textSize = axisTextSize
         textAlign = Paint.Align.CENTER
     }
-    private val xAxisLineWidth = 1.dp
-    private val xAxisLinePaint = Paint().apply {
+    private var axisLineWidth = 1.dp
+    private val axisLinePaint = Paint().apply {
         color = Color.BLACK
-        strokeWidth = xAxisLineWidth
+        strokeWidth = axisLineWidth
     }
 
-    private val dotRadius = 4.dp
-    private val focusedDotRadius = 10.dp
-    private val themeColor = Color.GREEN
+    private var dotRadius = 4.dp
+    private var focusedDotRadius = 10.dp
+    private var themeColor = Color.GREEN
     private val lineWidth = 1.dp
+    private var startColor = Color.GREEN
+    private var endColor = Color.TRANSPARENT
+
+    init {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleLineChart, defStyleAttr, 0)
+        axisLineColor = typedArray.getColor(R.styleable.SimpleLineChart_axisLineColor, axisLineColor)
+        axisTextSize = typedArray.getDimension(R.styleable.SimpleLineChart_axisTextSize, axisTextSize)
+        axisTextMargin = typedArray.getDimension(R.styleable.SimpleLineChart_chartBottomMargin, axisTextMargin)
+        axisLineWidth = typedArray.getDimension(R.styleable.SimpleLineChart_axisLineWidth, axisLineWidth)
+        axisTextPaint.textSize = axisTextSize
+        axisLinePaint.color = axisLineColor
+        axisLinePaint.strokeWidth = axisLineWidth
+        dotRadius = typedArray.getDimension(R.styleable.SimpleLineChart_dotRadius, dotRadius)
+        focusedDotRadius = typedArray.getDimension(R.styleable.SimpleLineChart_dotSelectedRadius, focusedDotRadius)
+        themeColor = typedArray.getColor(R.styleable.SimpleLineChart_color, themeColor)
+        startColor = typedArray.getColor(R.styleable.SimpleLineChart_startColor, startColor)
+        endColor = typedArray.getColor(R.styleable.SimpleLineChart_endColor, endColor)
+        typedArray.recycle()
+    }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val textHeight = xAxisTextPaint.fontMetrics.descent - xAxisTextPaint.fontMetrics.ascent
+        val textHeight = axisTextPaint.fontMetrics.descent - axisTextPaint.fontMetrics.ascent
         val xAxisTextY = height.toFloat()
         data.map { it.time }.forEachIndexed { index, text ->
             val textX = when (index) {
@@ -54,16 +73,16 @@ class SimpleLineChart @JvmOverloads constructor(
                 data.size - 1 -> width.toFloat()
                 else -> width / (data.size - 1) * index.toFloat()
             }.toFloat()
-            xAxisTextPaint.textAlign = when (index) {
+            axisTextPaint.textAlign = when (index) {
                 0 -> Paint.Align.LEFT
                 data.size - 1 -> Paint.Align.RIGHT
                 else -> Paint.Align.CENTER
             }
-            canvas.drawText(text, textX, xAxisTextY, xAxisTextPaint)
+            canvas.drawText(text, textX, xAxisTextY, axisTextPaint)
         }
 
-        val xAxisLineY = xAxisTextY - textHeight - xAxisTextMargin
-        canvas.drawLine(0f, xAxisLineY, width.toFloat(), xAxisLineY, xAxisLinePaint)
+        val xAxisLineY = xAxisTextY - textHeight - axisTextMargin
+        canvas.drawLine(0f, xAxisLineY, width.toFloat(), xAxisLineY, axisLinePaint)
 
         //if (data.all { it.value == ChartData.NO_VALUE }) return
 
@@ -87,7 +106,7 @@ class SimpleLineChart @JvmOverloads constructor(
                 style = Paint.Style.FILL
                 shader = LinearGradient(
                     0f, 0f, 0f, xAxisLineY,
-                    themeColor.changeAlpha(80), Color.TRANSPARENT, Shader.TileMode.CLAMP
+                    startColor, endColor, Shader.TileMode.CLAMP
                 )
             })
             return
@@ -133,7 +152,7 @@ class SimpleLineChart @JvmOverloads constructor(
                 style = Paint.Style.FILL
                 shader = LinearGradient(
                     0f, 0f, 0f, xAxisLineY,
-                    themeColor.changeAlpha(80), Color.TRANSPARENT, Shader.TileMode.CLAMP
+                    startColor, endColor, Shader.TileMode.CLAMP
                 )
             })
         }

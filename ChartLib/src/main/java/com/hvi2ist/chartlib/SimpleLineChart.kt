@@ -43,6 +43,7 @@ class SimpleLineChart @JvmOverloads constructor(
     private val lineWidth = 1.dp
     private var startColor = Color.GREEN
     private var endColor = Color.TRANSPARENT
+    private var showPlaceholder = false
 
     init {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleLineChart, defStyleAttr, 0)
@@ -58,6 +59,7 @@ class SimpleLineChart @JvmOverloads constructor(
         themeColor = typedArray.getColor(R.styleable.SimpleLineChart_color, themeColor)
         startColor = typedArray.getColor(R.styleable.SimpleLineChart_startColor, startColor)
         endColor = typedArray.getColor(R.styleable.SimpleLineChart_endColor, endColor)
+        showPlaceholder = typedArray.getBoolean(R.styleable.SimpleLineChart_showPlaceHolder, showPlaceholder)
         typedArray.recycle()
     }
 
@@ -97,18 +99,20 @@ class SimpleLineChart @JvmOverloads constructor(
 
         // 没有有效数据
         if (lastValidIndex == -1 && firstValidIndex == -1) {
-            range.moveTo(dotRadius, dotRadius)
-            range.lineTo(width.toFloat() - dotRadius, dotRadius)
-            range.lineTo(width.toFloat() - dotRadius, xAxisLineY)
-            range.lineTo(dotRadius, xAxisLineY)
-            range.close()
-            canvas.drawPath(range, Paint().apply {
-                style = Paint.Style.FILL
-                shader = LinearGradient(
-                    0f, 0f, 0f, xAxisLineY,
-                    startColor, endColor, Shader.TileMode.CLAMP
-                )
-            })
+            if (showPlaceholder) {
+                range.moveTo(dotRadius, dotRadius)
+                range.lineTo(width.toFloat() - dotRadius, dotRadius)
+                range.lineTo(width.toFloat() - dotRadius, xAxisLineY)
+                range.lineTo(dotRadius, xAxisLineY)
+                range.close()
+                canvas.drawPath(range, Paint().apply {
+                    style = Paint.Style.FILL
+                    shader = LinearGradient(
+                        0f, 0f, 0f, xAxisLineY,
+                        startColor, endColor, Shader.TileMode.CLAMP
+                    )
+                })
+            }
             return
         }
 
@@ -197,11 +201,11 @@ class SimpleLineChart @JvmOverloads constructor(
     companion object {
         private const val TAG = "SimpleLineChart"
         private const val INVALID_Y = -100f
+    }
 
-        data class ChartData(val time: String, val value: Int = NO_VALUE) {
-            companion object {
-                const val NO_VALUE = -1
-            }
+    data class ChartData(val time: String, val value: Int = NO_VALUE) {
+        companion object {
+            const val NO_VALUE = -1
         }
     }
 }

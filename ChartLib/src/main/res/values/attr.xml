@@ -27,6 +27,7 @@
     </attr>
     <attr name="infoPadding" format="dimension"/>
     <attr name="lineWidth" format="dimension" />
+    <attr name="yUnit" format="string" />
 
     <declare-styleable name="BarChart">
         <attr name="chartBottomMargin"/>
@@ -45,6 +46,7 @@
         <attr name="infoLayout"/>
         <attr name="infoPos"/>
         <attr name="infoPadding"/>
+        <attr name="yUnit"/>
     </declare-styleable>
 
 
@@ -108,5 +110,6 @@
         <attr name="chartBottomMargin" />
         <attr name="startColor" format="color"/>
         <attr name="endColor" format="color"/>
+        <attr name="showPlaceHolder" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -15,7 +15,7 @@ import com.hvi2ist.chart.ui.theme.ChartTheme
 import com.hvi2ist.chartlib.BarChart.Companion.BarData
 import com.hvi2ist.chartlib.HealthRangeView
 import com.hvi2ist.chartlib.LineChart
-import com.hvi2ist.chartlib.SimpleLineChart.Companion.ChartData
+import com.hvi2ist.chartlib.SimpleLineChart
 import com.hvi2ist.chartlib.TimeIntervalLineChart
 import com.hvi2ist.chartlib.TimeLineData
 import kotlinx.datetime.LocalDateTime
@@ -42,9 +42,9 @@ class MainActivity : ComponentActivity() {
         setContentView(binding.root)
         binding.simpleLineChart.setData(
             listOf(
-                ChartData("11", ChartData.NO_VALUE),
-                ChartData("12", ChartData.NO_VALUE),
-                ChartData("13", ChartData.NO_VALUE),
+                SimpleLineChart.ChartData("11", SimpleLineChart.ChartData.NO_VALUE),
+                SimpleLineChart.ChartData("12", SimpleLineChart.ChartData.NO_VALUE),
+                SimpleLineChart.ChartData("13", SimpleLineChart.ChartData.NO_VALUE),
             ),
             1
         )

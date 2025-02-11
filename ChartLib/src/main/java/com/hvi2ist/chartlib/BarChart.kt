@@ -71,6 +71,7 @@ class BarChart @JvmOverloads constructor(
     private var touchLineColor = Color.RED
     private var infoPos = PosType.TOP
     private var infoPadding = 20.dp
+    private var yUnitStr: String = ""
 
     private lateinit var textPaint: Paint
     private lateinit var axisLinePaint: Paint
@@ -122,6 +123,7 @@ class BarChart @JvmOverloads constructor(
         infoLayoutId = typedArray.getResourceId(R.styleable.BarChart_infoLayout, -1)
         infoPos = PosType.fromValue(typedArray.getInt(R.styleable.BarChart_infoPos, infoPos.value))
         infoPadding = typedArray.getDimension(R.styleable.BarChart_infoPadding, infoPadding)
+        yUnitStr = typedArray.getString(R.styleable.BarChart_yUnit) ?: ""
         typedArray.recycle()
 
         if (infoLayoutId != -1) {
@@ -202,8 +204,8 @@ class BarChart @JvmOverloads constructor(
         // 纵坐标
         textPaint.textAlign = Paint.Align.LEFT
         val yValues = listOf(0, maxValue / 4, maxValue / 2, maxValue / 4 * 3, maxValue).reversed()
-        val yValueMax = yValues.max()
-        textPaint.getTextBounds(yValueMax.toString(), 0, yValueMax.toString().length, bounds)
+        val yValueMax = yValues.max().toString() + yUnitStr
+        textPaint.getTextBounds(yValueMax, 0, yValueMax.length, bounds)
         val yAxisTextWidth = bounds.width()
         val yAxisTextHeight = bounds.height()
         val yAxisTextX = paddingStart.toFloat()
@@ -212,7 +214,7 @@ class BarChart @JvmOverloads constructor(
         yValues.forEachIndexed { index, value ->
             if (index == yValues.size - 1) return@forEachIndexed
             val tY = yUnit * index + yAxisTextHeight
-            canvas.drawText(value.toString(), yAxisTextX, tY, textPaint)
+            canvas.drawText(value.toString() + yUnitStr, yAxisTextX, tY, textPaint)
         }
 
         val yAxisX = paddingStart + yAxisTextWidth + chartLeftMargin

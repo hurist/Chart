@@ -8,9 +8,8 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.toRectF
 import com.hvi2ist.chartlib.util.dp
+import com.hvi2ist.chartlib.util.toRectF
 
 class StepProgress @JvmOverloads constructor(
     context: Context,
@@ -25,7 +24,7 @@ class StepProgress @JvmOverloads constructor(
     private var progress = 0
     private var iconSize = 20.dp
     private var iconMargin = 10.dp
-    private var iconDrawable = ContextCompat.getDrawable(context, android.R.drawable.ic_menu_camera)
+    private var iconDrawable = context.getDrawable(android.R.drawable.ic_menu_camera)
 
     private val rect = Rect()
 
@@ -94,5 +93,15 @@ class StepProgress @JvmOverloads constructor(
         rect.set(left.toInt(), top, right.toInt(), bottom.toInt())
         iconDrawable?.bounds = rect
         iconDrawable?.draw(canvas)
+    }
+
+    fun setProgress(progress: Int) {
+        this.progress = progress
+        invalidate()
+    }
+
+    fun setMax(max: Int) {
+        this.max = max
+        invalidate()
     }
 }

@@ -139,7 +139,7 @@ class BarChart @JvmOverloads constructor(
     }
 
     private fun initPaints() {
-        textPaint = Paint().apply {
+        textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             textSize = axisTextSize
             color = axisTextColor
         }
@@ -147,7 +147,7 @@ class BarChart @JvmOverloads constructor(
             strokeWidth = axisLineWidth
             color = axisLineColor
         }
-        barPaint = Paint().apply {
+        barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = barColor
             style = Paint.Style.FILL
         }
@@ -241,11 +241,6 @@ class BarChart @JvmOverloads constructor(
             val value = data.value + data.value2
 
             val barHeight = (chartHeight * value / maxValue).coerceAtLeast(2.dp) // 最小高度为2dp, 不然看不见
-            barPaint.color = when {
-                targetValue <= 0 -> barColor
-                value < targetValue -> barUnreachedColor
-                else -> barColor
-            }
             val left = chartStartX + (space + barWidth) * index
             val top = (chartHeight - barHeight).coerceAtMost(chartBottomY)
             val top2 = top + (chartHeight * data.value2 / maxValue).coerceAtMost(chartBottomY)
@@ -256,7 +251,11 @@ class BarChart @JvmOverloads constructor(
                 if (value == data.value2) {
                     barPaint.color = stackBarColor
                 } else {
-                    barPaint.color = barColor
+                    barPaint.color = when {
+                        targetValue <= 0 -> barColor
+                        value < targetValue -> barUnreachedColor
+                        else -> barColor
+                    }
                 }
                 val rect = RectF(left, (top + radius).coerceAtMost(chartBottomY), right, bottom)
                 canvas.drawRect(rect, barPaint)
@@ -439,7 +438,9 @@ class BarChart @JvmOverloads constructor(
         targetValue: Float = -1f,
     ) {
         this.data = data
-        this.maxValue = ChartUtil.getChartMaxValue(data.maxOf { it.value + it.value2 }, targetValue)
+        if (data.isNotEmpty()) {
+            this.maxValue = ChartUtil.getChartMaxValue(data.maxOf { it.value + it.value2 }, targetValue)
+        }
         this.targetValue = targetValue
         invalidate()
     }

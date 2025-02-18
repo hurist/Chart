@@ -3,10 +3,11 @@ package com.hvi2ist.chartlib.util
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Rect
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
-import kotlinx.datetime.LocalTime
+import org.threeten.bp.LocalTime
 import kotlin.math.abs
 
 /**
@@ -55,15 +56,20 @@ internal fun View.toBitmap(): Bitmap {
     return bitmap
 }
 
+
+
+
 internal fun LocalTime.isMorning(): Boolean {
     val hour = this.hour
     return hour < 12 || hour == 12 && this.minute == 0
 }
+
 internal fun LocalTime.minutesBetween(other: LocalTime): Int {
     val thisMinutes = this.hour * 60 + this.minute
     val otherMinutes = other.hour * 60 + other.minute
     return abs(thisMinutes - otherMinutes)
 }
+
 
 internal fun View.disableParentClip() {
     val parent = parent
@@ -74,3 +80,5 @@ internal fun View.disableParentClip() {
         }
     }
 }
+
+internal fun Rect.toRectF() = android.graphics.RectF(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())

@@ -138,7 +138,7 @@ class LineChart @JvmOverloads constructor(
     }
 
     private fun initPaints() {
-        textPaint = Paint().apply {
+        textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             textSize = axisTextSize
             color = axisTextColor
         }
@@ -155,11 +155,11 @@ class LineChart @JvmOverloads constructor(
             strokeWidth = 1.dp
             pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f)
         }
-        linePaint = Paint().apply {
+        linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = lineColor
             strokeWidth = lineWidth
         }
-        dotPaint = Paint().apply {
+        dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = lineColor
             style = Paint.Style.FILL
         }
@@ -265,7 +265,8 @@ class LineChart @JvmOverloads constructor(
                 else -> {
                     val value = data[index].value
                     rangeColors.firstOrNull {
-                        value in it.range.first..it.range.second
+                        value > it.range.first && value <= it.range.second
+                        //value in it.range.first..it.range.second
                     }?.color ?: lineColor
                 }
             }
@@ -301,7 +302,8 @@ class LineChart @JvmOverloads constructor(
                 else -> {
                     val value = lastValidData.value
                     rangeColors.firstOrNull {
-                        value in it.range.first..it.range.second
+                        value > it.range.first && value <= it.range.second
+                        //value in it.range.first..it.range.second
                     }?.color ?: lineColor
                 }
             }
@@ -424,7 +426,9 @@ class LineChart @JvmOverloads constructor(
         rangeColors: List<RangeColor> = emptyList()
     ) {
         this.data = data
-        this.maxValue = if (isPercentage) 100 else ChartUtil.getChartMaxValue(data.maxOf { it.value })
+        if (data.isNotEmpty()) {
+            this.maxValue = if (isPercentage) 100 else ChartUtil.getChartMaxValue(data.maxOf { it.value })
+        }
         this.rangeColors = rangeColors
         invalidate()
     }

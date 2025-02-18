@@ -21,11 +21,10 @@ import com.hvi2ist.chartlib.util.isMorning
 import com.hvi2ist.chartlib.util.minutesBetween
 import com.hvi2ist.chartlib.util.sp
 import com.hvi2ist.chartlib.util.toBitmap
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.FormatStringsInDatetimeFormats
-import kotlinx.datetime.format.byUnicodePattern
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.LocalTime
+import java.util.Locale
 import kotlin.math.abs
 
 class TimeIntervalLineChart @JvmOverloads constructor(
@@ -164,7 +163,7 @@ class TimeIntervalLineChart @JvmOverloads constructor(
     }
 
     private fun initPaints() {
-        textPaint = Paint().apply {
+        textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             textSize = axisTextSize
             color = axisTextColor
         }
@@ -181,7 +180,7 @@ class TimeIntervalLineChart @JvmOverloads constructor(
             strokeWidth = 1.dp
             pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f)
         }
-        dotPaint = Paint().apply {
+        dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = startDotColor
             style = Paint.Style.FILL
         }
@@ -238,10 +237,10 @@ class TimeIntervalLineChart @JvmOverloads constructor(
     private fun drawYAxis(canvas: Canvas) {
         // 纵坐标
         textPaint.textAlign = Paint.Align.LEFT
-        val maxValue = 1440 // 一天的分钟数
+        //val maxValue = 1440 // 一天的分钟数
         val yValues = listOf(0, maxValue / 4, maxValue / 2, maxValue / 4 * 3, maxValue).reversed()
-        val yValueMax = yValues.max()
-        textPaint.getTextBounds(yValueMax.toString(), 0, yValueMax.toString().length, bounds)
+        //val yValueMax = yValues.max()
+        textPaint.getTextBounds("00:00", 0, 5, bounds)
         val yAxisTextWidth = bounds.width()
         val yAxisTextHeight = bounds.height()
         val yAxisTextX = paddingStart.toFloat()
@@ -255,7 +254,7 @@ class TimeIntervalLineChart @JvmOverloads constructor(
                 1 -> "06:00"
                 2 -> "00:00"
                 3 -> "18:00"
-                else -> "12:01"
+                else -> "12:00"
             }
             canvas.drawText(text, yAxisTextX, tY.coerceAtMost(chartHeight), textPaint)
         }
@@ -272,10 +271,8 @@ class TimeIntervalLineChart @JvmOverloads constructor(
         chartBottomY = yAxisEndY
     }
 
-    val time0Clock = LocalTime(0, 0)
-    val time1201Clock = LocalTime(11, 59)
-    val startTime = LocalTime(0, 0)
-    val endTime = LocalTime(0, 0)
+    val time0Clock = LocalTime.parse("00:00") //LocalTime(0, 0)
+    val time1201Clock = LocalTime.parse("11:59")//LocalTime(11, 59)
     private fun calcDotPos() {
         dotPos.clear()
         val chartStartX = chartStartX + axisLineWidth / 2 + chartHorizontalPadding
@@ -289,40 +286,43 @@ class TimeIntervalLineChart @JvmOverloads constructor(
             val startTime = value.startTime
             val endTime = value.endTime
             // 小于等于12点，位于图表上半部分
-            if (startTime.isMorning()) {
-                val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
-                if (xIndex != -1) {
-                    val minutes = startTime.minutesBetween(time0Clock)
-                    val y = chartCenterY - minutes * yUnit
-                    val x = chartStartX + xIndex * xUnit
-                    dotPos.add(DotPos(value.belongDateString,true, x, y))
-                }
-            } else {
-                val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
-                if (xIndex != -1) {
-                    val minutes = startTime.minutesBetween(time1201Clock)
-                    val y = chartBottomY - minutes * yUnit
-                    val x = chartStartX + xIndex * xUnit
-                    dotPos.add(DotPos(value.belongDateString,true, x, y))
+            if(startTime != null) {
+                if (startTime.isMorning()) {
+                    val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
+                    if (xIndex != -1) {
+                        val minutes = startTime.minutesBetween(time0Clock)
+                        val y = chartCenterY - minutes * yUnit
+                        val x = chartStartX + xIndex * xUnit
+                        dotPos.add(DotPos(value.belongDateString,true, x, y))
+                    }
+                } else {
+                    val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
+                    if (xIndex != -1) {
+                        val minutes = startTime.minutesBetween(time1201Clock)
+                        val y = chartBottomY - minutes * yUnit
+                        val x = chartStartX + xIndex * xUnit
+                        dotPos.add(DotPos(value.belongDateString,true, x, y))
+                    }
                 }
             }
 
-
-            if (endTime.isMorning()) {
-                val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
-                if (xIndex != -1) {
-                    val minutes = endTime.minutesBetween(time0Clock)
-                    val y = chartCenterY - minutes * yUnit
-                    val x = chartStartX + xIndex * xUnit
-                    dotPos.add(DotPos(value.belongDateString,false, x, y))
-                }
-            } else {
-                val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
-                if (xIndex != -1) {
-                    val minutes = endTime.minutesBetween(time1201Clock)
-                    val y = chartBottomY - minutes * yUnit
-                    val x = chartStartX + xIndex * xUnit
-                    dotPos.add(DotPos(value.belongDateString,false, x, y))
+            if(endTime != null) {
+                if (endTime.isMorning()) {
+                    val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
+                    if (xIndex != -1) {
+                        val minutes = endTime.minutesBetween(time0Clock)
+                        val y = chartCenterY - minutes * yUnit
+                        val x = chartStartX + xIndex * xUnit
+                        dotPos.add(DotPos(value.belongDateString,false, x, y))
+                    }
+                } else {
+                    val xIndex = belowDate.indexOfFirst { it == value.belongDate } // 确定这个时间在横轴的哪一天
+                    if (xIndex != -1) {
+                        val minutes = endTime.minutesBetween(time1201Clock)
+                        val y = chartBottomY - minutes * yUnit
+                        val x = chartStartX + xIndex * xUnit
+                        dotPos.add(DotPos(value.belongDateString,false, x, y))
+                    }
                 }
             }
         }
@@ -448,10 +448,12 @@ class TimeIntervalLineChart @JvmOverloads constructor(
 
     private fun callbackTouchListener(lastTouchBarIndex: Int, childView: View) {
         if (touchedDotIndex != -1 && lastTouchBarIndex != touchedDotIndex) {
+            var isStart = false
             val index = data.indexOfFirst {
+                isStart = dotPos[touchedDotIndex].isStart
                 it.belongDateString == dotPos[touchedDotIndex].belongDateString
             }
-            onTouchBarListener?.invoke(childView, data[index], touchedDotIndex)
+            onTouchBarListener?.invoke(childView, data[index], touchedDotIndex,isStart)
         }
         if (lastTouchBarIndex != touchedDotIndex) {
             postInvalidate()
@@ -466,10 +468,10 @@ class TimeIntervalLineChart @JvmOverloads constructor(
         invalidate()
     }
 
-    private var onTouchBarListener: ((infoView: View, barData: TimeLineData, index: Int) -> Unit)? =
+    private var onTouchBarListener: ((infoView: View, barData: TimeLineData, index: Int,isStart: Boolean) -> Unit)? =
         null
 
-    fun setOnTouchBarListener(callback: (infoView: View, barData: TimeLineData, index: Int) -> Unit) {
+    fun setOnTouchBarListener(callback: (infoView: View, barData: TimeLineData, index: Int,isStart: Boolean) -> Unit) {
         onTouchBarListener = callback
     }
 
@@ -515,20 +517,15 @@ class TimeIntervalLineChart @JvmOverloads constructor(
 class TimeLineData(
     val belongDateString: String,
     val label: String,
-    val startValue: String,
-    val endValue: String
+    val startValue: String? = null,
+    val endValue: String? = null
 ) {
     companion object {
-        @OptIn(FormatStringsInDatetimeFormats::class)
-        private val dateFormat = DateTimeComponents.Format {
-            byUnicodePattern("uuuu-MM-dd HH:mm:ss")
-        }
+        private val dateFormat = org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
     }
     val belongDate = LocalDate.parse(belongDateString)
-    val startDateTime = dateFormat.parse(startValue).toLocalDateTime()
-    val startTime = startDateTime.time
-    val endDateTime = dateFormat.parse(endValue).toLocalDateTime()
-    val endTime = endDateTime.time
+    val startTime: LocalTime? = if(startValue.isNullOrEmpty()) null else LocalDateTime.parse(startValue, dateFormat).toLocalTime()
+    val endTime: LocalTime? = if(endValue.isNullOrEmpty()) null else LocalDateTime.parse(endValue, dateFormat).toLocalTime()
 
     override fun toString(): String {
         return """
@@ -536,6 +533,8 @@ class TimeLineData(
             label: $label
             startDateTime: $startValue
             endDateTime: $endValue
+            startTime: $startTime
+            endTime: $endTime
             """
     }
 }

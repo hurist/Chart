@@ -6,6 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.hvi2ist.chartlib.util.changeAlpha
+import com.hvi2ist.chartlib.util.disableParentClip
 import com.hvi2ist.chartlib.util.dp
 import com.hvi2ist.chartlib.util.sp
 
@@ -25,7 +26,7 @@ class SimpleLineChart @JvmOverloads constructor(
     private var axisLineColor = Color.BLACK
     private var axisTextSize = 12.sp
     private var axisTextMargin = 6.dp
-    private val axisTextColor = Color.BLACK
+    private var axisTextColor = Color.BLACK
     private val axisTextPaint = Paint().apply {
         color = axisTextColor
         textSize = axisTextSize
@@ -38,7 +39,7 @@ class SimpleLineChart @JvmOverloads constructor(
     }
 
     private var dotRadius = 4.dp
-    private var focusedDotRadius = 10.dp
+    private var focusedDotRadius = 5.dp
     private var themeColor = Color.GREEN
     private val lineWidth = 1.dp
     private var startColor = Color.GREEN
@@ -49,9 +50,11 @@ class SimpleLineChart @JvmOverloads constructor(
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleLineChart, defStyleAttr, 0)
         axisLineColor = typedArray.getColor(R.styleable.SimpleLineChart_axisLineColor, axisLineColor)
         axisTextSize = typedArray.getDimension(R.styleable.SimpleLineChart_axisTextSize, axisTextSize)
+        axisTextColor = typedArray.getColor(R.styleable.SimpleLineChart_axisTextColor, axisTextColor)
         axisTextMargin = typedArray.getDimension(R.styleable.SimpleLineChart_chartBottomMargin, axisTextMargin)
         axisLineWidth = typedArray.getDimension(R.styleable.SimpleLineChart_axisLineWidth, axisLineWidth)
         axisTextPaint.textSize = axisTextSize
+        axisTextPaint.color = axisTextColor
         axisLinePaint.color = axisLineColor
         axisLinePaint.strokeWidth = axisLineWidth
         dotRadius = typedArray.getDimension(R.styleable.SimpleLineChart_dotRadius, dotRadius)
@@ -60,6 +63,7 @@ class SimpleLineChart @JvmOverloads constructor(
         startColor = typedArray.getColor(R.styleable.SimpleLineChart_startColor, startColor)
         endColor = typedArray.getColor(R.styleable.SimpleLineChart_endColor, endColor)
         showPlaceholder = typedArray.getBoolean(R.styleable.SimpleLineChart_showPlaceHolder, showPlaceholder)
+        disableParentClip()
         typedArray.recycle()
     }
 
@@ -89,7 +93,7 @@ class SimpleLineChart @JvmOverloads constructor(
         //if (data.all { it.value == ChartData.NO_VALUE }) return
 
         val yAxis = data.map { it.value }
-        val max = yAxis.maxOrNull() ?: 0
+        val max = (yAxis.maxOrNull() ?: 0).coerceAtLeast(1)
         val yUnit = (xAxisLineY) / max
         val path = Path()
         val range = Path()
@@ -117,7 +121,6 @@ class SimpleLineChart @JvmOverloads constructor(
         }
 
         yAxis.forEachIndexed { index, yValue ->
-            val lastValidPoint = dotPos.lastOrNull { it.second != INVALID_Y }
             val radius = if (index != focusedIndex) dotRadius else focusedDotRadius - 4.dp
             var dotX = width / (yAxis.size - 1) * index.toFloat()
             if (index == 0) dotX = radius
@@ -126,7 +129,7 @@ class SimpleLineChart @JvmOverloads constructor(
             val dotY = if (yValue == ChartData.NO_VALUE) {
                 INVALID_Y
             } else {
-                (xAxisLineY - yValue * yUnit).coerceIn(radius, xAxisLineY)
+                (xAxisLineY - yValue * yUnit).coerceIn(0f, xAxisLineY)
             }
             dotPos.add(Triple(dotX, dotY, radius))
 
@@ -164,22 +167,27 @@ class SimpleLineChart @JvmOverloads constructor(
         dotPos.forEachIndexed { index, (dotX, dotY, radius) ->
             if (dotY == INVALID_Y) return@forEachIndexed
             if (index == focusedIndex) {
-                canvas.drawCircle(dotX, dotY, focusedDotRadius, Paint().apply {
+                canvas.drawCircle(dotX, dotY, focusedDotRadius + 2.dp, Paint().apply {
                     style = Paint.Style.FILL
                     shader = RadialGradient(
-                        dotX, dotY, focusedDotRadius,
+                        dotX, dotY, focusedDotRadius + 2.dp,
                         themeColor, Color.TRANSPARENT, Shader.TileMode.CLAMP
                     )
                 })
-                canvas.drawCircle(dotX, dotY, focusedDotRadius - 2.dp, Paint().apply {
+                canvas.drawCircle(dotX, dotY, focusedDotRadius, Paint().apply {
                     style = Paint.Style.FILL
                     color = Color.WHITE
                 })
+                canvas.drawCircle(dotX, dotY, focusedDotRadius - 1.dp, Paint().apply {
+                    style = Paint.Style.FILL
+                    color = themeColor
+                })
+            } else {
+                canvas.drawCircle(dotX, dotY, radius, Paint().apply {
+                    color = themeColor
+                    style = Paint.Style.FILL
+                })
             }
-            canvas.drawCircle(dotX, dotY, radius, Paint().apply {
-                color = themeColor
-                style = Paint.Style.FILL
-            })
         }
     }
 

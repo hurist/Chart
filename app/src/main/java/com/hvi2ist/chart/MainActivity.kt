@@ -16,17 +16,9 @@ import com.hvi2ist.chartlib.BarChart.Companion.BarData
 import com.hvi2ist.chartlib.HealthRangeView
 import com.hvi2ist.chartlib.LineChart
 import com.hvi2ist.chartlib.SimpleLineChart
-import com.hvi2ist.chartlib.TimeIntervalLineChart
 import com.hvi2ist.chartlib.TimeLineData
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.format.FormatStringsInDatetimeFormats
-import kotlinx.datetime.format.byUnicodePattern
-import kotlinx.datetime.toInstant
 import java.text.SimpleDateFormat
 import java.util.Date
-import kotlin.math.abs
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +26,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var binding : ActivityMainBinding
 
 
-    @OptIn(FormatStringsInDatetimeFormats::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -109,7 +100,7 @@ class MainActivity : ComponentActivity() {
             TimeLineData("2025-01-07", "二", "2025-01-07 10:40:28", "2025-01-07 22:20:03")
         )
         binding.timeLineChart.setData(sleepData)
-        binding.timeLineChart.setOnTouchBarListener { infoView, barData, index ->
+        binding.timeLineChart.setOnTouchBarListener { infoView, barData, index, isStart ->
             binding.timeLineChart.post {
                 infoView.findViewById<TextView>(com.hvi2ist.chartlib.R.id.root).text = barData.toString()
             }
